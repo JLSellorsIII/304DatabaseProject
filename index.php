@@ -54,7 +54,7 @@
 		if (!$statement) {
 			echo "Could not parse statement '$sql'<br>";
 			$e = OCIError();
-			echo htmlentities($e['message']):
+			echo htmlentities($e['message']);
 			$success = False;
 		}
 
