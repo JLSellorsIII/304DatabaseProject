@@ -10,6 +10,16 @@
 				<input type="submit" value="Add" name="addCustomer">
 			</form>
 		</div>
+		<div class="op-container">
+			<h2>Add Shift</h2>
+			<form method="POST" action="index.php">
+				Shift ID: <input type="text" name="shiftID"><br>
+				Business ID: <input type="text" name="bid"><br>
+				Email: <input type="text" name="email"><br>
+				Wage: <input type="text" name="Wage"><br>
+				<input type="submit" value="Add" name="addShift">
+			</form>
+		</div>
 	</body>
 <?php
 	$success = True;
@@ -77,6 +87,19 @@
 					(pNumber		VARCHAR(13),
 					name			VARCHAR(20),
 					PRIMARY KEY (pNumber))");
+					
+		executeSQL("CREATE TABLE ScheduledShift
+					(shiftID    INTEGER,
+					 bid          INTEGER NOT NULL,
+					 email      VARCHAR(30) NOT NULL,
+					 Wage	     DECIMAL(5,2),
+					 UNIQUE(email, startTime),
+					PRIMARY KEY shiftID,
+					FOREIGN KEY bid REFERENCES Business (bid)
+					ON UPDATE CASCADE
+					FOREIGN KEY (email) REFERENCES Account (email)
+					ON DELETE CASCADE
+					ON UPDATE CASCADE)");
 		OCICommit($db_conn);
 	}
 
@@ -87,11 +110,21 @@
 		VALUES (" . $_POST['cNum'] . ", " . $_POST['cName'] . ")");
 		OCICommit($db_conn);
 	}
+	
+	function handleAddShift() {
+		global $db_conn;
+
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
+		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")");
+		OCICommit($db_conn);
+	}
 
 	function handlePOSTRequest() {
 		if(connectDB()) {
 			if(array_key_exists("addCustomer")) {
 				handleAddCustomer();
+			} else if(array_key_exists("addShift")) {
+				handleAddShift();
 			}
 			disconnectDB();
 		}
