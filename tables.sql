@@ -1,10 +1,29 @@
+DROP TABLE Business;
+DROP TABLE VisitedLength;
+DROP TABLE VisitedTime;
+DROP TABLE Consumables;
+DROP TABLE Perishables;
+DROP TABLE nonPerishables;
+DROP TABLE Violation;
+DROP TABLE Warning;
+DROP TABLE Fine;
+DROP TABLE CustomerPartyContact;
+DROP TABLE Account;
+DROP TABLE Accesses;
+DROP TABLE CovidSupplies;
+DROP TABLE ScheduledShift;
+DROP TABLE ScheduledTime;
+DROP TABLE RecordedTransaction;
+DROP TABLE TracksDate;
+DROP TABLE TracksPaid;
+
 CREATE TABLE Business
 (url         VARCHAR(200),
  name	    VARCHAR(50),
  capacity INTEGER,
  bid         INTEGER,
  address  VARCHAR(50),
- UNIQUE(name, address),
+ UNIQUE (name, address),
  PRIMARY KEY bid);
 
 CREATE TABLE VisitedLength
@@ -58,7 +77,7 @@ ON UPDATE CASCADE);
 CREATE TABLE Violation
 (law		VARCHAR(50),
  description	VARCHAR(400)
- PRIMARY KEY (law));
+ PRIMARY KEY law);
 
 CREATE TABLE Warning
 (law		VARCHAR(50),
