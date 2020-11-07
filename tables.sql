@@ -1,22 +1,3 @@
-DROP TABLE Business;
-DROP TABLE VisitedLength;
-DROP TABLE VisitedTime;
-DROP TABLE Consumables;
-DROP TABLE Perishables;
-DROP TABLE nonPerishables;
-DROP TABLE Violation;
-DROP TABLE Warning;
-DROP TABLE Fine;
-DROP TABLE CustomerPartyContact;
-DROP TABLE Account;
-DROP TABLE Accesses;
-DROP TABLE CovidSupplies;
-DROP TABLE ScheduledShift;
-DROP TABLE ScheduledTime;
-DROP TABLE RecordedTransaction;
-DROP TABLE TracksDate;
-DROP TABLE TracksPaid;
-
 CREATE TABLE Business
 (url         VARCHAR(200),
  name	    VARCHAR(50),
@@ -24,7 +5,7 @@ CREATE TABLE Business
  bid         INTEGER,
  address  VARCHAR(50),
  UNIQUE (name, address),
- PRIMARY KEY bid);
+ PRIMARY KEY (bid));
 
 CREATE TABLE VisitedLength
 (Time		DATETIME,
@@ -41,7 +22,7 @@ PRIMARY KEY (Time, pNumber, bid),
 FOREIGN KEY (pNumber) REFERENCES CustomerPartyContact (pNumber)
 	ON UPDATE CASCADE,
 FOREIGN KEY (bid) REFERENCES Business (bid)
-ON UPDATE CASCADE)
+ON UPDATE CASCADE,
 FOREIGN KEY (Time, Duration) REFERENCES Visited (Time, Duration)
 ON UPDATE CASCADE
 ON DELETE CASCADE);
@@ -57,11 +38,11 @@ PRIMARY KEY (bid, cid));
 CREATE TABLE Perishables
 (expirationDate	DATE,
  cid			INTEGER,
- bid			INTEGER
+ bid			INTEGER,
  PRIMARY KEY (cid, bid),
  FOREIGN KEY cid REFERENCES Consumables
 ON DELETE CASCADE
-ON UPDATE CASCADE
+ON UPDATE CASCADE,
  FOREIGN KEY bid REFERENCES Business
 ON UPDATE CASCADE);
 
@@ -76,8 +57,8 @@ ON UPDATE CASCADE);
 
 CREATE TABLE Violation
 (law		VARCHAR(50),
- description	VARCHAR(400)
- PRIMARY KEY law);
+ description	VARCHAR(400),
+ PRIMARY KEY (law));
 
 CREATE TABLE Warning
 (law		VARCHAR(50),
@@ -186,3 +167,22 @@ ON DELETE CASCADE,
 FOREIGN KEY (law) REFERENCES Violation (law)
 	ON UPDATE CASCADE
 	ON DELETE CASCADE);
+	
+DROP TABLE Business;
+DROP TABLE VisitedLength;
+DROP TABLE VisitedTime;
+DROP TABLE Consumables;
+DROP TABLE Perishables;
+DROP TABLE nonPerishables;
+DROP TABLE Violation;
+DROP TABLE Warning;
+DROP TABLE Fine;
+DROP TABLE CustomerPartyContact;
+DROP TABLE Account;
+DROP TABLE Accesses;
+DROP TABLE CovidSupplies;
+DROP TABLE ScheduledShift;
+DROP TABLE ScheduledTime;
+DROP TABLE RecordedTransaction;
+DROP TABLE TracksDate;
+DROP TABLE TracksPaid;
