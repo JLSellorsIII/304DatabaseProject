@@ -1,9 +1,8 @@
 DROP TABLE Business;
 DROP TABLE VisitedLength;
 DROP TABLE VisitedTime;
-DROP TABLE Consumables;
-DROP TABLE Perishables;
-DROP TABLE nonPerishables;
+DROP TABLE PerishableConsumables;
+DROP TABLE nonPerishableConsumables;
 DROP TABLE Violation;
 DROP TABLE Warning;
 DROP TABLE Fine;
