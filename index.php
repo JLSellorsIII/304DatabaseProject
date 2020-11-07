@@ -1,5 +1,8 @@
 <html>
-	<head>CPSC Group 92 Project</head>
+	<link rel="stylesheet" href="styles.css"/>
+	<head>
+		<title>CPSC Group 92 Project</title>
+	</head>
 
 	<body>
 		<div class="header">
@@ -10,50 +13,73 @@
 			<a href="#queries">Query</a>
 		</div>
 		<div id="home">
+			<h1>Home</h1>
 			<div class="op-container">
 				<form method="GET" action="index.php">
 					<input type="hidden" value="initTables" name="initTables">
-					<input type="submit" value="Reset Tables" name="initTables">
+					<input type="submit" class="button" value="Reset Tables" name="initTables">
 				</form>
 			</div>
 		</div>
 		<div id="additions">
+			<h1>Additions</h1>
 			<div class="op-container">
 				<h2>Add Visiting Customer</h2>
 				<form method="POST" action="index.php">
-					Name: <input type="text" name="cName"><br>
-					Number: <input type="text" name="cNum"><br>
-					<input type="submit" value="Add" name="addCustomer">
+					<div>
+						<p>Name:</p>
+						<input type="text" name="cName">
+					</div>
+					<div>
+						<p>Number:</p>
+						<input type="text" name="cNum">
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addCustomer">
 				</form>
 			</div>
 			<div class="op-container">
 				<h2>Add Shift</h2>
 				<form method="POST" action="index.php">
-					Shift ID: <input type="text" name="shiftID"><br>
-					Business ID: <input type="text" name="bid"><br>
-					Email: <input type="text" name="email"><br>
-					Wage: <input type="text" name="Wage"><br>
-					<input type="submit" value="Add" name="addShift">
+					<div>
+						<p>Shift ID: </p>
+						<input type="text" name="shiftID">
+					</div>
+					<div>
+						<p>Business ID: </p>
+						<input type="text" name="bid">
+					</div>
+					<div>
+						<p>Email: </p>
+						<input type="text" name="email">
+					</div>
+					<div>
+						<p>Wage: </p>
+						<input type="text" name="Wage">
+					</div>
+					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 			</div>
 		</div>
 		<div id="updates">
+			<h1>Updates</h1>
 		</div>
 		<div id="deletes">
+			<h1>Deletes</h1>
 		</div>
 		<div id="queries">
+			<h1>Queries</h1>
 			<div class="op-container">
 				<h2>Display the Tuples in Visiting Customer Table</h2>
 				<form method="GET" action="index.php">
 					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
-					<input type="submit" name="displayVisitingCustomer"></p>
+					<input type="submit" class="button" value="Get" name="displayVisitingCustomer"></p>
 				</form>
 			</div>
 			<div class="op-container">
 				<h2>Display the Tuples in Scheduled Shift Table</h2>
 				<form method="GET" action="index.php">
 					<input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
-					<input type="submit" name="displayScheduledShift"></p>
+					<input type="submit" class="button" value="Get" name="displayScheduledShift"></p>
 				</form>
 			</div>
 		</div>
