@@ -26,11 +26,25 @@
 				<input type="submit" value="Add" name="addShift">
 			</form>
 		</div>
+		<div class="op-container">
+			<h2>Display the Tuples in Visiting Customer Table</h2>
+			<form method="GET" action="index.php">
+            <input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
+            <input type="submit" name="displayVisitingCustomer"></p>
+        </form>
+		</div>
+		<div class="op-container">
+			<h2>Display the Tuples in Scheduled Shift Table</h2>
+			<form method="GET" action="index.php">
+            <input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
+            <input type="submit" name="displayScheduledShift"></p>
+        </form>
+		</div>
 	</body>
 <?php
 	$success = True;
 	$db_conn = NULL;
-	$show_alerts = false;
+	$show_alerts = True;
 
 	function showAlert($alert) {
 		global $show_alerts;
@@ -133,7 +147,13 @@
 		if(connectDB()) {
 			if(array_key_exists('initTables', $_GET)) {
 				initTables();
-			}
+			} else if (array_key_exists('displayScheduledShift', $_GET)) {
+				$result = executePlainSQL("SELECT * FROM ScheduledShift");
+				printResult($result);
+			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
+				$result = executePlainSQL("SELECT * FROM customerPartyContact");
+				printResult($result);
+			} 
 			disconnectDB();
 		}
 
