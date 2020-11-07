@@ -2,45 +2,63 @@
 	<head>CPSC Group 92 Project</head>
 
 	<body>
-		<div class="op-container">
-			<form method="GET" action="index.php">
-				<input type="hidden" value="initTables" name="initTables">
-				<input type="submit" value="Reset Tables" name="initTables">
-			</form>
+		<div class="header">
+			<a href="#home">Home</a>
+			<a href="#additions">Add</a>
+			<a href="#updates">Update</a>
+			<a href="#deletes">Delete</a>
+			<a href="#queries">Query</a>
 		</div>
-		<div class="op-container">
-			<h2>Add Visiting Customer</h2>
-			<form method="POST" action="index.php">
-				Name: <input type="text" name="cName"><br>
-				Number: <input type="text" name="cNum"><br>
-				<input type="submit" value="Add" name="addCustomer">
-			</form>
+		<div id="home">
+			<div class="op-container">
+				<form method="GET" action="index.php">
+					<input type="hidden" value="initTables" name="initTables">
+					<input type="submit" value="Reset Tables" name="initTables">
+				</form>
+			</div>
 		</div>
-		<div class="op-container">
-			<h2>Add Shift</h2>
-			<form method="POST" action="index.php">
-				Shift ID: <input type="text" name="shiftID"><br>
-				Business ID: <input type="text" name="bid"><br>
-				Email: <input type="text" name="email"><br>
-				Wage: <input type="text" name="Wage"><br>
-				<input type="submit" value="Add" name="addShift">
-			</form>
+		<div id="additions">
+			<div class="op-container">
+				<h2>Add Visiting Customer</h2>
+				<form method="POST" action="index.php">
+					Name: <input type="text" name="cName"><br>
+					Number: <input type="text" name="cNum"><br>
+					<input type="submit" value="Add" name="addCustomer">
+				</form>
+			</div>
+			<div class="op-container">
+				<h2>Add Shift</h2>
+				<form method="POST" action="index.php">
+					Shift ID: <input type="text" name="shiftID"><br>
+					Business ID: <input type="text" name="bid"><br>
+					Email: <input type="text" name="email"><br>
+					Wage: <input type="text" name="Wage"><br>
+					<input type="submit" value="Add" name="addShift">
+				</form>
+			</div>
 		</div>
-		<div class="op-container">
-			<h2>Display the Tuples in Visiting Customer Table</h2>
-			<form method="GET" action="index.php">
-            <input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
-            <input type="submit" name="displayVisitingCustomer"></p>
-        </form>
+		<div id="updates">
 		</div>
-		<div class="op-container">
-			<h2>Display the Tuples in Scheduled Shift Table</h2>
-			<form method="GET" action="index.php">
-            <input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
-            <input type="submit" name="displayScheduledShift"></p>
-        </form>
+		<div id="deletes">
+		</div>
+		<div id="queries">
+			<div class="op-container">
+				<h2>Display the Tuples in Visiting Customer Table</h2>
+				<form method="GET" action="index.php">
+					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
+					<input type="submit" name="displayVisitingCustomer"></p>
+				</form>
+			</div>
+			<div class="op-container">
+				<h2>Display the Tuples in Scheduled Shift Table</h2>
+				<form method="GET" action="index.php">
+					<input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
+					<input type="submit" name="displayScheduledShift"></p>
+				</form>
+			</div>
 		</div>
 	</body>
+
 <?php
 	$success = True;
 	$db_conn = NULL;
