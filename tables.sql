@@ -1,20 +1,20 @@
-DROP TABLE Business;
-DROP TABLE VisitedLength;
 DROP TABLE VisitedTime;
+DROP TABLE VisitedLength;
 DROP TABLE PerishableConsumables;
 DROP TABLE nonPerishableConsumables;
-DROP TABLE Violation;
-DROP TABLE Warning;
-DROP TABLE Fine;
-DROP TABLE CustomerPartyContact;
-DROP TABLE Account;
-DROP TABLE Accesses;
-DROP TABLE CovidSupplies;
-DROP TABLE ScheduledShift;
-DROP TABLE ScheduledTime;
-DROP TABLE RecordedTransaction;
 DROP TABLE TracksDate;
 DROP TABLE TracksPaid;
+DROP TABLE Warning;
+DROP TABLE Fine;
+DROP TABLE Violation;
+DROP TABLE CustomerPartyContact;
+DROP TABLE ScheduledTime;
+DROP TABLE ScheduledShift;
+DROP TABLE Accesses;
+DROP TABLE Account;
+DROP TABLE CovidSupplies;
+DROP TABLE RecordedTransaction;
+DROP TABLE Business;
 
 CREATE TABLE Business
 (url         VARCHAR(200),
@@ -170,4 +170,3 @@ ON DELETE CASCADE,
 FOREIGN KEY (law) REFERENCES Violation (law)
 	/* ON UPDATE CASCADE */
 	ON DELETE CASCADE);
-
