@@ -19,6 +19,7 @@
 					<input type="hidden" value="initTables" name="initTables">
 					<input type="submit" class="button" value="Reset Tables" name="initTables">
 				</form>
+			<div id="initTablesSuccess"/>
 			</div>
 		</div>
 		<div id="additions">
@@ -36,6 +37,7 @@
 					</div>
 					<input class="submit button" type="submit" value="Add" name="addCustomer">
 				</form>
+			<div id="addCustomerSuccess"/>
 			</div>
 			<div class="op-container">
 				<h2>Add Shift</h2>
@@ -58,6 +60,7 @@
 					</div>
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
+				<div id="addShiftSuccess"/>
 			</div>
 		</div>
 		<div id="updates">
@@ -74,6 +77,7 @@
 					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
 					<input type="submit" class="button" value="Get" name="displayVisitingCustomer"></p>
 				</form>
+				<div id="displayVisitingCustomerSuccess"/>
 				<div id="visitingCustomerTable"/>
 			</div>
 			<div class="op-container">
@@ -82,6 +86,7 @@
 					<input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
 					<input type="submit" class="button" value="Get" name="displayScheduledShift"></p>
 				</form>
+				<div id="displayScheduledShiftSuccess"/>
 			</div>
 		</div>
 	</body>
@@ -92,7 +97,7 @@
 		}
 
 		function resetElementText(id) {
-			id.innerHTML = "";
+			document.getElementById(id).innerHTML = '';
 		}
 	 </script>
 <?php
@@ -106,6 +111,10 @@
 		if($show_alerts) {
 			echo "<script type='text/javascript'>alert('$alert')</script>";
 		}
+	}
+
+	function callJSFunc($func) {
+		echo "<script type='text/javascript'>" . $func. "</script>";
 	}
 
 	function connectDB() {
@@ -130,32 +139,31 @@
 		OCILogoff($db_conn);
 	}
 
-	function executeSQL($sql) {
+	function executeSQL($sql, $successElement) {
 		global $db_conn, $success;
 
 		$statement = OCIParse($db_conn, $sql);
 
 		if (!$statement) {
-			echo "Could not parse statement " . $sql . "<br>";
 			$e = OCI_Error($db_conn);
-			echo htmlentities($e['message']);
-			$success = False;
+			callJSFunc("printToElement(" . $successElement .
+					   ", `<p class='error'> Error parsing request.<br>" .
+					   htmlentities($e['message']) . "</p>`);");
+			return $statement;
 		}
 
 		$r = OCIExecute($statement, OCI_DEFAULT);
 		if(!$r) {
-			echo "<br>Could not execute statement " . $sql . "<br>";
 			$e = oci_error($statement);
-			echo htmlentities($e['message']);
-			$success = False;
+			callJSFunc("printToElement(" . $successElement .
+					   ", `<p class='error'> Error executing request.<br>" .
+					   htmlentities($e['message']) . "</p>`);");
+			return $statement;
 		}
 
+		callJSFunc("printToElement(" . $successElement . ", `<p class='success'> Your request was executed successfully.</p>`)");
 		return $statement;
 
-	}
-
-	function callJSFunc($func) {
-		echo "<script type='text/javascript'>$func</script>";
 	}
 
 	function initTables() {
@@ -166,7 +174,8 @@
 
 		foreach($sqlArr as &$statement) {
 			if(strlen($statement) > 1) {
-				executeSQL($statement);
+				callJSFunc("resetElementText('initTablesSuccess')");
+				executeSQL($statement, "initTablesSuccess");
 			}
 		}
 
@@ -178,7 +187,7 @@
 		global $db_conn;
 
 		$result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
-		VALUES (" . $_POST['cNum'] . ", " . $_POST['cName'] . ")");
+		VALUES (" . $_POST['cNum'] . ", " . $_POST['cName'] . ")", "addCustomerSuccess");
 		OCICommit($db_conn);
 	}
 	
@@ -186,23 +195,13 @@
 		global $db_conn;
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
-		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")");
+		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")",
+		"addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
-	function handlePOSTRequest() {
-		if(connectDB()) {
-			if(array_key_exists("addCustomer")) {
-				handleAddCustomer();
-			} else if(array_key_exists("addShift")) {
-				handleAddShift();
-			}
-			disconnectDB();
-		}
-	}
-
 	function displayScheduledShift() {
-		$result = executeSQL("SELECT * FROM ScheduledShift");
+		$result = executeSQL("SELECT * FROM ScheduledShift", "displayScheduledShiftSuccess");
 		echo "<table>";
 		echo "<tr><th>ID</th><th>Name</th></tr>";
 
@@ -214,7 +213,7 @@
 	}
 
 	function displayVisitingCustomer() {
-		$result = executeSQL("SELECT * FROM customerPartyContact");
+		$result = executeSQL("SELECT * FROM customerPartyContact", "displayVisitingCustomerSuccess");
 		$elementID = "visitingCustomerTable";
 		$tableString = "";
 
@@ -224,7 +223,18 @@
 		}
 		$tableString .= '</table>';
 
-		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "')");
+		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
+	}
+
+	function handlePOSTRequest() {
+		if(connectDB()) {
+			if(array_key_exists("addCustomer", $_POST)) {
+				handleAddCustomer();
+			} else if(array_key_exists("addShift", $_POST)) {
+				handleAddShift();
+			}
+			disconnectDB();
+		}
 	}
 
 	function handleGETRequest() {
