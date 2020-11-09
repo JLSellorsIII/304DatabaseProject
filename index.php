@@ -74,6 +74,7 @@
 					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
 					<input type="submit" class="button" value="Get" name="displayVisitingCustomer"></p>
 				</form>
+				<div id="visitingCustomerTable"/>
 			</div>
 			<div class="op-container">
 				<h2>Display the Tuples in Scheduled Shift Table</h2>
@@ -85,10 +86,19 @@
 		</div>
 	</body>
 
+	 <script type="text/javascript">
+		function printToElement(id, text) {
+			id.innerHTML += text;
+		}
+
+		function resetElementText(id) {
+			id.innerHTML = "";
+		}
+	 </script>
 <?php
 	$success = True;
 	$db_conn = NULL;
-	$show_alerts = True;
+	$show_alerts = False;
 
 	function showAlert($alert) {
 		global $show_alerts;
@@ -144,6 +154,10 @@
 
 	}
 
+	function callJSFunc($func) {
+		echo "<script type='text/javascript'>$func</script>";
+	}
+
 	function initTables() {
 		global $db_conn;
 		$initFile = fopen("tables.sql", 'r') or showAlert("Unable to open file tables.sql");
@@ -187,17 +201,41 @@
 		}
 	}
 
+	function displayScheduledShift() {
+		$result = executeSQL("SELECT * FROM ScheduledShift");
+		echo "<table>";
+		echo "<tr><th>ID</th><th>Name</th></tr>";
+
+		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
+		}
+
+		echo "</table>";
+	}
+
+	function displayVisitingCustomer() {
+		$result = executeSQL("SELECT * FROM customerPartyContact");
+		$elementID = "visitingCustomerTable";
+		$tableString = "";
+
+		$tableString .= '<table><tr><th>Name</th><th>Phone Number</th></tr>';
+		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			$tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td></tr>';
+		}
+		$tableString .= '</table>';
+
+		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "')");
+	}
+
 	function handleGETRequest() {
 		if(connectDB()) {
 			if(array_key_exists('initTables', $_GET)) {
 				initTables();
 			} else if (array_key_exists('displayScheduledShift', $_GET)) {
-				$result = executePlainSQL("SELECT * FROM ScheduledShift");
-				printResult($result);
+				displayScheduledShift();
 			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
-				$result = executePlainSQL("SELECT * FROM customerPartyContact");
-				printResult($result);
-			} 
+				displayVisitingCustomer();
+			}
 			disconnectDB();
 		}
 
