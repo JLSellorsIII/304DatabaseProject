@@ -72,21 +72,17 @@
 		<div id="queries">
 			<h1>Queries</h1>
 			<div class="op-container">
-				<h2>Display the Tuples in Visiting Customer Table</h2>
-				<form method="GET" action="index.php">
-					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
-					<input type="submit" class="button" value="Get" name="displayVisitingCustomer"></p>
+				<h2>Display the Tuples in Selected Table</h2>
+				<form method="POST" action="index.php">
+					<input type="hidden" id="displayTable" name="displaySelectedTable">
+						<select id="tableSelect" name="table">
+							<option value="scheduledShift">ScheduledShift</option>
+							<option value="customerPartyContact">CustomerPartyContact</option>
+						</select>
+					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
-				<div id="displayVisitingCustomerSuccess"/>
-				<div id="visitingCustomerTable"/>
-			</div>
-			<div class="op-container">
-				<h2>Display the Tuples in Scheduled Shift Table</h2>
-				<form method="GET" action="index.php">
-					<input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
-					<input type="submit" class="button" value="Get" name="displayScheduledShift"></p>
-				</form>
-				<div id="displayScheduledShiftSuccess"/>
+				<div id="displayTableSuccess"/>
+				<div id="mainTable"/>
 			</div>
 		</div>
 	</body>
@@ -200,25 +196,6 @@
 		OCICommit($db_conn);
 	}
 
-	function displayScheduledShift() {
-		$result = executeSQL("SELECT * FROM ScheduledShift", "displayScheduledShiftSuccess");
-		echo "<table>";
-		echo "<tr><th>ID</th><th>Name</th></tr>";
-
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
-		}
-
-		echo "</table>";
-	}
-
-	function displayVisitingCustomer() {
-		$result = executeSQL("SELECT * FROM customerPartyContact", "displayVisitingCustomerSuccess");
-		$headers = ["name", "pNumber"];
-		$altHeaders = ["Name", "Phone Number"];
-		printTable($result, $headers, $altHeaders, "visitingCustomerTable");
-	}
-
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -243,12 +220,31 @@
 		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
 	}
 
+	function handleDisplayTable() {
+		switch($_POST['table']) {
+			case "scheduledShift":
+				$result = executeSQL("SELECT * FROM ScheduledShift", "displayTableSuccess");
+				$headers = ["shiftID", "bid", "Email", "Wage"];
+				$altHeaders = null;
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "customerPartyContact":
+				$result = executeSQL("SELECT * FROM CustomerPartyContact", "displayTableSuccess");
+				$headers = ["name", "pNumber"];
+				$altHeaders = ["Name", "Phone Number"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+		}
+	}
+
 	function handlePOSTRequest() {
 		if(connectDB()) {
 			if(array_key_exists("addCustomer", $_POST)) {
 				handleAddCustomer();
 			} else if(array_key_exists("addShift", $_POST)) {
 				handleAddShift();
+			} else if (array_key_exists('displayTable', $_POST)) {
+				handleDisplayTable();
 			}
 			disconnectDB();
 		}
@@ -258,10 +254,6 @@
 		if(connectDB()) {
 			if(array_key_exists('initTables', $_GET)) {
 				initTables();
-			} else if (array_key_exists('displayScheduledShift', $_GET)) {
-				displayScheduledShift();
-			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
-				displayVisitingCustomer();
 			}
 			disconnectDB();
 		}
