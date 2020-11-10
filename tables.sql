@@ -112,12 +112,10 @@ CREATE TABLE ScheduledShift
 (shiftID    INTEGER,
  bid          INTEGER NOT NULL,
  email      VARCHAR(30) NOT NULL,
- startTime  TIMESTAMP,
  Wage	     DECIMAL(5,2),
- UNIQUE(email),
-PRIMARY KEY (shiftID),
-FOREIGN KEY (bid) REFERENCES Business (bid)
-/* ON UPDATE CASCADE */,
+PRIMARY KEY shiftID,
+FOREIGN KEY bid REFERENCES Business (bid)
+ON UPDATE CASCADE
 FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
