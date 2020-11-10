@@ -73,6 +73,35 @@
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 				<div id="addShiftSuccess"/>
+
+                <div class="op-container">
+                    <h2>Add Business</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>url: </p>
+                            <input type="text" name="url">
+                        </div>
+                        <div>
+                            <p>name: </p>
+                            <input type="text" name="name">
+                        </div>
+                        <div>
+                            <p>capacity: </p>
+                            <input type="text" name="capacity">
+                        </div>
+                        <div>
+                            <p>business ID: </p>
+                            <input type="text" name="bid">
+                        </div>
+                        <div>
+                            <p>Address: </p>
+                            <input type="text" name="address">
+                        </div>
+                        <input type="submit" class="submit button" value="Add" name="addBusiness">
+                    </form>
+                    <div id="addBusinessSuccess"/>
+                </div>
+
 			</div>
 		</div>
 		<div id="updates">
