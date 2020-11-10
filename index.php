@@ -242,6 +242,16 @@
 		OCICommit($db_conn);
 	}
 
+	function handleAddBusiness() {
+	    global $db_conn;
+
+	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
+        $_POST['url'] . "," . $_POST['name'] . "," . $_POST['capacity'] . "," . $_POST['bid'] . "," .
+        $_POST['address'] . ")");
+
+	    OCICommit($db_conn);
+    }
+
 	function displayScheduledShift() {
 		$result = executeSQL("SELECT * FROM ScheduledShift", "displayScheduledShiftSuccess");
 		echo "<table>";
@@ -274,7 +284,9 @@
 				handleAddCustomer();
 			} else if(array_key_exists("addShift", $_POST)) {
 				handleAddShift();
-			}
+			} else if(array_key_exists("addBusiness", $_POST)) {
+			    handleAddBusiness();
+            }
 			disconnectDB();
 		}
 	}
