@@ -1,80 +1,29 @@
+DROP TABLE VisitedTime;
+DROP TABLE VisitedLength;
+DROP TABLE PerishableConsumables;
+DROP TABLE nonPerishableConsumables;
+DROP TABLE TracksDate;
+DROP TABLE TracksPaid;
+DROP TABLE Warning;
+DROP TABLE Fine;
+DROP TABLE Violation;
+DROP TABLE CustomerPartyContact;
+DROP TABLE ScheduledTime;
+DROP TABLE ScheduledShift;
+DROP TABLE Accesses;
+DROP TABLE Account;
+DROP TABLE CovidSupplies;
+DROP TABLE RecordedTransaction;
+DROP TABLE Business;
+
 CREATE TABLE Business
 (url         VARCHAR(200),
  name	    VARCHAR(50),
  capacity INTEGER,
  bid         INTEGER,
  address  VARCHAR(50),
- UNIQUE(name, address),
- PRIMARY KEY bid);
-
-CREATE TABLE VisitedLength
-(Time		DATETIME,
-Duration	INTEGER,
-endTime	DATETIME,
-PRIMARY KEY (Time, Duration));
-
-CREATE TABLE VisitedTime
-(Time		DATETIME,
-pNumber	VARCHAR(13),
-bid		INTEGER,
-Duration	INTEGER,
-PRIMARY KEY (Time, pNumber, bid),
-FOREIGN KEY (pNumber) REFERENCES CustomerPartyContact (pNumber)
-	ON UPDATE CASCADE,
-FOREIGN KEY (bid) REFERENCES Business (bid)
-ON UPDATE CASCADE)
-FOREIGN KEY (Time, Duration) REFERENCES Visited (Time, Duration)
-ON UPDATE CASCADE
-ON DELETE CASCADE);
-
-CREATE TABLE Consumables
-(quantity	INTEGER,
- cid                INTEGER,
- bid		INTEGER NOT NULL,
- FOREIGN KEY bid REFERENCES Business
-ON UPDATE CASCADE,
-PRIMARY KEY (bid, cid));
-
-CREATE TABLE Perishables
-(expirationDate	DATE,
- cid			INTEGER,
- bid			INTEGER
- PRIMARY KEY (cid, bid),
- FOREIGN KEY cid REFERENCES Consumables
-ON DELETE CASCADE
-ON UPDATE CASCADE
- FOREIGN KEY bid REFERENCES Business
-ON UPDATE CASCADE);
-
-CREATE TABLE nonPerishables
-(cid	        INTEGER,
- PRIMARY KEY (cid, bid),
- FOREIGN KEY cid REFERENCES Consumables
-ON DELETE CASCADE
-ON UPDATE CASCADE
- FOREIGN KEY bid REFERENCES Business
-ON UPDATE CASCADE);
-
-CREATE TABLE Violation
-(law		VARCHAR(50),
- description	VARCHAR(400)
- PRIMARY KEY (law));
-
-CREATE TABLE Warning
-(law		VARCHAR(50),
- level		INTEGER,
- PRIMARY KEY (law),
- FOREIGN KEY (law) REFERENCES Violation (law)
-ON UPDATE CASCADE
-ON DELETE CASCADE);
-
-CREATE TABLE Fine
-(law		VARCHAR(50),
- amount	INTEGER,
- PRIMARY KEY (law),
- FOREIGN KEY (law) REFERENCES Violation (law)
-ON UPDATE CASCADE
-ON DELETE CASCADE);
+ UNIQUE (name, address),
+ PRIMARY KEY (bid));
 
 CREATE TABLE CustomerPartyContact
 (pNumber		VARCHAR(13),
@@ -85,26 +34,79 @@ CREATE TABLE Account
 (email       VARCHAR(30),
  password VARCHAR(38),
  PRIMARY KEY (email));
+ 
+ CREATE TABLE VisitedLength
+(arrivalTime		TIMESTAMP,
+Duration	INTEGER,
+endTime	TIMESTAMP,
+PRIMARY KEY (arrivalTime, Duration));
+
+CREATE TABLE VisitedTime
+(arrivalTime		TIMESTAMP,
+pNumber	VARCHAR(13),
+bid		INTEGER,
+Duration	INTEGER,
+PRIMARY KEY (arrivalTime, pNumber, bid),
+FOREIGN KEY (pNumber) REFERENCES CustomerPartyContact (pNumber)
+	/* ON UPDATE CASCADE */,
+FOREIGN KEY (bid) REFERENCES Business (bid)
+/* ON UPDATE CASCADE */,
+FOREIGN KEY (arrivalTime, Duration) REFERENCES VisitedLength (arrivalTime, Duration)
+/* ON UPDATE CASCADE */
+ON DELETE CASCADE);
+
+CREATE TABLE PerishableConsumables
+(expirationDate	DATE,
+ cid			INTEGER,
+ bid			INTEGER,
+FOREIGN KEY (bid) REFERENCES Business (bid) /* ON UPDATE CASCADE */,
+ PRIMARY KEY (cid, bid));
+
+CREATE TABLE nonPerishableConsumables
+(cid			INTEGER,
+ bid			INTEGER,
+FOREIGN KEY (bid) REFERENCES Business (bid) /* ON UPDATE CASCADE */,
+ PRIMARY KEY (cid, bid));
+
+CREATE TABLE Violation
+(law		VARCHAR(50),
+ description	VARCHAR(400),
+ PRIMARY KEY (law));
+
+CREATE TABLE Warning
+(law		VARCHAR(50),
+ severity	INTEGER,
+ PRIMARY KEY (law),
+ FOREIGN KEY (law) REFERENCES Violation (law)
+/* ON UPDATE CASCADE */
+ON DELETE CASCADE);
+
+CREATE TABLE Fine
+(law		VARCHAR(50),
+ amount	INTEGER,
+ PRIMARY KEY (law),
+ FOREIGN KEY (law) REFERENCES Violation (law)
+/* ON UPDATE CASCADE */
+ON DELETE CASCADE);
+
 
 CREATE TABLE Accesses
 (email VARCHAR(30),
  bid     INTEGER,
- write? BOOLEAN,
+ writePermission NUMBER(1),
  PRIMARY KEY(email, bid),
- FOREIGN KEY(email) REFERENCES Account (email)
-	ON UPDATE CASCADE
-ON DELETE CASCADE,
- FOREIGN KEY(bid) REFERENCES Business
-	ON UPDATE CASCADE);
+ FOREIGN KEY(email) REFERENCES Account (email) ON DELETE CASCADE,
+ 	/* ON UPDATE CASCADE */
+ FOREIGN KEY(bid) REFERENCES Business (bid)
+	/* ON UPDATE CASCADE */);
 
 CREATE TABLE CovidSupplies
 (quantity    INTEGER,
  csid	       INTEGER,
- bid 	       INTEGER  NOT NULL,
- PRIMARY KEY csid,
- FOREIGN KEY bid REFERENCES Business (bid),
-ON UPDATE CASCADE
-SET CONSTRAINT bid NOT NULL DEFERRED);
+ bid 	       INTEGER  NOT NULL DEFERRABLE,
+ PRIMARY KEY (csid),
+ FOREIGN KEY (bid) REFERENCES Business (bid)
+/* ON UPDATE CASCADE */);
 
 CREATE TABLE ScheduledShift
 (shiftID    INTEGER,
@@ -116,53 +118,53 @@ FOREIGN KEY bid REFERENCES Business (bid)
 ON UPDATE CASCADE
 FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
-ON UPDATE CASCADE);
+/* ON UPDATE CASCADE */);
 
 CREATE TABLE ScheduledTime
-(shiftID: integer,
- 	 startTime: DATETIME,
- endTime: DATETIME,
- duration: DECIMAL(4,2),
-PRIMARY KEY shiftID,
-FOREIGN KEY shiftID REFERENCES ScheduledShift
+(shiftID INTEGER,
+ startTime TIMESTAMP,
+ endTime TIMESTAMP,
+ duration DECIMAL(4,2),
+PRIMARY KEY (shiftID),
+FOREIGN KEY (shiftID) REFERENCES ScheduledShift (shiftID)
 ON DELETE CASCADE
-ON UPDATE CASCADE);
+/* ON UPDATE CASCADE */);
 
-CREATE TABLE RecordedTransaction (tid: INTEGER,
-bid:INTEGER NOT NULL,
-amount: DECIMAL(7,2),
-date: DATETIME,
-PRIMARY KEY tid
-FOREIGN KEY bid REFERENCES BUSINESS
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE);
+CREATE TABLE RecordedTransaction
+(tid INTEGER,
+bid INTEGER NOT NULL,
+amount DECIMAL(7,2),
+transactionDate TIMESTAMP,
+PRIMARY KEY (tid),
+FOREIGN KEY (bid) REFERENCES Business (bid)
+    /* ON UPDATE CASCADE */);
 
 CREATE TABLE TracksDate
 (bid		INTEGER,
-email		VARCHAR(30,
-Law		VARCHAR(50),
-date		DATETIME,
+email		VARCHAR(30),
+law		VARCHAR(50),
+violationDate	TIMESTAMP,
 PRIMARY KEY (bid, email, law),
 FOREIGN KEY (bid) REFERENCES Business (bid)
-	ON UPDATE CASCADE,
+	/* ON UPDATE CASCADE */,
 FOREIGN KEY (email) REFERENCES Account (email)
-	ON UPDATE CASCADE
+	/* ON UPDATE CASCADE */
 	ON DELETE CASCADE,
 FOREIGN KEY (law) REFERENCES Violation (law)
-ON UPDATE CASCADE
+/* ON UPDATE CASCADE */
 ON DELETE CASCADE);
 
 CREATE TABLE TracksPaid
 	(bid		INTEGER,
 email		VARCHAR(30),
 law		VARCHAR(50),
-paid		BOOLEAN,
+paid		NUMBER(1),
 PRIMARY KEY (bid, email, law),
 FOREIGN KEY (bid) REFERENCES Business (bid)
-ON UPDATE CASCADE,
+/* ON UPDATE CASCADE */,
 FOREIGN KEY (email) REFERENCES Account (email)
-ON UPDATE CASCADE
+/* ON UPDATE CASCADE */
 ON DELETE CASCADE,
-FOREIGN KEY (Law) REFERENCES Violation (law)
-	ON UPDATE CASCADE
+FOREIGN KEY (law) REFERENCES Violation (law)
+	/* ON UPDATE CASCADE */
 	ON DELETE CASCADE);
