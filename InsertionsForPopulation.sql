@@ -5,26 +5,15 @@ INSERT INTO Business(url, name, capacity,bid, address) VALUES
     ('washingtonpizzafactory.com', 'Washington Pizza Factory', 60, 0004, '1400 Pen Boulevard'),
     ('samssandwiches.ca', 'Sam’s Sandwiches', 45, 0005, '2500 Nathan Lane');
 
-INSERT INTO Consumables(quantity, cid, bid) VALUES
-    (2,0002,0001),
-    (40,0003,0002),
-    (21,0004,0003),
-    (100,0005,0004),
-    (604,0001,0005),
-    (2,0006,0001),
-    (40,0007,0002),
-    (21,0008,0003),
-    (100,0009,0005),
-    (604,0010,0001);
 
-INSERT INTO Perishables(expirationDate, cid, bid) VALUES
+INSERT INTO PerishablesConsumables(expirationDate, cid, bid) VALUES
    (2021-09-11, 0001, 0001),
    (2021-07-06, 0002, 0002),
    (2022-08-23, 0003, 0003),
    (2094-06-30, 0004, 0004),
    (2020-07-07, 0005, 0005);
 
-INSERT INTO nonPerishables(cid, bid) VALUES
+INSERT INTO nonPerishableConsumables(cid, bid) VALUES
     (0006,0001),
     (0007,0002),
     (0008,0003),
@@ -40,8 +29,8 @@ INSERT INTO CovidSupplies(quantity,csid,bid) VALUES
 
 INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
      (0001,0001,'bob@uncle.com', 20.25),
-     (0002, 0002, 'bob@uncle.com', 10.94),
-     (0003, 0003, 'student@ubc.ca', 11.93),
+     (0002, 0002, 'bob@uncle.com',10.94),
+     (0003, 0003, 'student@ubc.ca',11.93),
      (0004, 0002, 'dark@headprotection.com', 00.01),
      (0005, 0003, 'student@ubc.ca', 11.93);
 
@@ -92,7 +81,7 @@ INSERT INTO Warning(law, level) VALUES
     ('Cash',1),
     ('Party size', 2);
 
-INSERT INTO Fine(law, fineAmount) VALUES
+INSERT INTO Fine(law, amount) VALUES
     ('Overcapacity', 3000),
     ('Quarantine', 5000),
     ('Divider', 200),
@@ -114,13 +103,13 @@ INSERT INTO Account(email, password) VALUES
     ('customer@gmail.com', 'THisIsmyPassw0rd'),
     ('official@gov.ca', '_p4ss-W0RD_');
 
-INSERT INTO Accesses(email, bid, write?) VALUES
-    ('@uncle.com',0001,TRUE),
-    ('student@ubc.ca',0002,FALSE),
-    ('dark@headprotection.com',0003, FALSE),
-    ('admin@businessname.com',0004,TRUE),
-    ('customer@gmail.com',0005, FALSE),
-    ('official@gov.ca',0005, TRUE);
+INSERT INTO Accesses(email, bid, writePermission) VALUES
+    ('@uncle.com',0001,1),
+    ('student@ubc.ca',0002,0),
+    ('dark@headprotection.com',0003, 0),
+    ('admin@businessname.com',0004,1),
+    ('customer@gmail.com',0005, 0),
+    ('official@gov.ca',0005, 1);
 
 INSERT INTO TracksDate(bid, email, law, paid, date) VALUES
     (0001, 'official@gov.ca', 'Sanitizer', '2020-07-07'),
@@ -130,9 +119,9 @@ INSERT INTO TracksDate(bid, email, law, paid, date) VALUES
     (0001, 'official@gov.ca', 'Sanitizer', '2020-07-10');
 
 INSERT INTO TracksPaid(bid,email,law,paid) VALUES
-    (0001, 'bob@uncle.com', 'Divider', TRUE),
-    (0002, 'bob@uncle.com', 'Extreme Overcapacity', FALSE),
-    (0002, 'bob@uncle.com', 'Divider', FALSE),
+    (0001, 'bob@uncle.com', 'Divider', 1),
+    (0002, 'bob@uncle.com', 'Extreme Overcapacity', 0),
+    (0002, 'bob@uncle.com', 'Divider', 1),
     (0003, 'official@gov.ca', 'Mask', NULL),
     (0001, 'official@gov.ca', 'Sanitizer', NULL);
 

@@ -111,7 +111,6 @@ CREATE TABLE ScheduledShift
  bid          INTEGER NOT NULL,
  email      VARCHAR(30) NOT NULL,
  Wage	     DECIMAL(5,2),
- UNIQUE(email, startTime),
 PRIMARY KEY shiftID,
 FOREIGN KEY bid REFERENCES Business (bid)
 ON UPDATE CASCADE
