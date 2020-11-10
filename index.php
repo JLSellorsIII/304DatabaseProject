@@ -187,7 +187,7 @@
 		global $db_conn;
 
 		$result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
-		VALUES (" . $_POST['cNum'] . ", " . $_POST['cName'] . ")", "addCustomerSuccess");
+		VALUES ('" . $_POST['cNum'] . "', '" . $_POST['cName'] . "')", "addCustomerSuccess");
 		OCICommit($db_conn);
 	}
 	
