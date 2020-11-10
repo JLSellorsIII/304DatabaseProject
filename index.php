@@ -278,6 +278,21 @@
 		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
 	}
 
+	function displayBusinesses() {
+	    $result = executeSQL("SELECT * FROM Business", "displayBusinessesSuccess");
+	    $elementID = "BusinessesTable";
+	    $tableString = "";
+
+        $tableString .= '<table><tr><th>url</th><th>name</th><th>capacity</th><th>bid</th><th>address</th></tr>';
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td>
+                <td>' . $row[2] . '</td><td>' . $row[3] . '</td><td>' . $row[4] . '</td></tr>';
+        }
+        $tableString .= '</table>';
+
+        callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
+    }
+
 	function handlePOSTRequest() {
 		if(connectDB()) {
 			if(array_key_exists("addCustomer", $_POST)) {
