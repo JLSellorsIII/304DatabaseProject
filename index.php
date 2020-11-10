@@ -214,16 +214,33 @@
 
 	function displayVisitingCustomer() {
 		$result = executeSQL("SELECT * FROM customerPartyContact", "displayVisitingCustomerSuccess");
-		$elementID = "visitingCustomerTable";
-		$tableString = "";
+		$headers = ["name", "pNumber"];
+		$altHeaders = ["Name", "Phone Number"];
+		printTable($result, $headers, $altHeaders, "visitingCustomerTable");
+	}
 
-		$tableString .= '<table><tr><th>Name</th><th>Phone Number</th></tr>';
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			$tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td></tr>';
+	function printTable($result, $headers, $altHeaders, $elem) {
+		$tableString = "<table><tr>";
+		if($altHeaders != null) {
+			foreach($altHeaders as &$header) {
+				$tableString .= "<th>" . $header . "</th>";
+			}
+		}else {
+			foreach($headers as &$header) {
+				$tableString .= "<th>" . $header . "</th>";
+			}
 		}
-		$tableString .= '</table>';
+		$tableString .= "</tr>";
 
-		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
+		while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			$tableString .= "<tr>";
+			foreach($headers as &$header) {
+				$tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
+			}
+			$tableString .= "</tr>";
+		}
+		$tableString .= "</table>";
+		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
 	}
 
 	function handlePOSTRequest() {
