@@ -102,6 +102,30 @@
                     <div id="addBusinessSuccess"/>
                 </div>
 
+                <div class="op-container">
+                    <h2>Add Transaction</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>transaction ID:</p>
+                            <input type="text" name="tid">
+                        </div>
+                        <div>
+                            <p>BusinessID:</p>
+                            <input type="text" name="bid">
+                        </div>
+                        <div>
+                            <p>amount:</p>
+                            <input type="text" name="amount">
+                        </div>
+                        <div>
+                            <p>date:</p>
+                            <input type="text" name="date">
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addTransaction">
+                    </form>
+                    <div id="addTransactionSuccess"/>
+                </div>
+
 			</div>
 		</div>
 		<div id="updates">
@@ -262,6 +286,15 @@
 	    OCICommit($db_conn);
     }
 
+    function handleAddTransaction() {
+	    global $db_conn;
+
+	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
+            $_POST['tid'] . "," . $_POST['bid'] . "," . $_POST['amount'] . "," . $_POST['date'] .  ")");
+
+	    OCICommit($db_conn);
+    }
+
 	function displayScheduledShift() {
 		$result = executeSQL("SELECT * FROM ScheduledShift", "displayScheduledShiftSuccess");
 		echo "<table>";
@@ -311,6 +344,8 @@
 				handleAddShift();
 			} else if(array_key_exists("addBusiness", $_POST)) {
 			    handleAddBusiness();
+            } else if(array_key_exists("addTransaction" , $_POST)) {
+			    handleAddTransaction();
             }
 			disconnectDB();
 		}
@@ -329,7 +364,6 @@
             }
 			disconnectDB();
 		}
-
 	}
 
 	if($_POST) {
