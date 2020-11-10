@@ -58,6 +58,18 @@
 						<p>Wage: </p>
 						<input type="text" name="Wage">
 					</div>
+                    <div>
+                        <p>StartTime: </p>
+                        <input type="text" name="startTime">
+                    </div>
+                    <div>
+                        <p>EndTime: </p>
+                        <input type="text" name="endTime">
+                    </div>
+                    <div>
+                        <p>Duration: </p>
+                        <input type="text" name="duration">
+                    </div>
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 				<div id="addShiftSuccess"/>
@@ -197,6 +209,7 @@
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
 		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")",
 		"addShiftSuccess");
+		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)");
 		OCICommit($db_conn);
 	}
 
