@@ -129,6 +129,16 @@
 				</form>
 				<div id="displayScheduledShiftSuccess"/>
 			</div>
+
+            <div class="op-container">
+                <h2>Display the Tuples in Business Table</h2>
+                <form method="GET" action="index.php">
+                    <input type="hidden" id="displayBusinesses" name="displayBusinesses">
+                    <input type="submit" class="button" value="Get" name="displayBusinesses"></p>
+                </form>
+                <div id="displayBusinessesSuccess"/>
+            </div>
+
 		</div>
 	</body>
 
@@ -314,7 +324,9 @@
 				displayScheduledShift();
 			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
 				displayVisitingCustomer();
-			}
+			} else if (array_key_exists('displayBusinesses', $_GET)) {
+			    displayBusinesses();
+            }
 			disconnectDB();
 		}
 
