@@ -21,6 +21,12 @@
 				</form>
 			<div id="initTablesSuccess"/>
 			</div>
+            <div class="op-container">
+            <form method="GET" action="index.php">
+                <input type="hidden" value="populateTables" name="populateTables">
+                <input type="submit" class="button" value="Populate Tables" name="populateTables">
+            </form>
+            <div id="populateTablesSuccess"/>
 		</div>
 		<div id="additions">
 			<h1>Additions</h1>
@@ -243,6 +249,9 @@
 
 	function initTables() {
 		global $db_conn;
+		$result = executeSQL("ALTER USER ora_omurovec quota unlimited on USERS");
+		$result = executeSQL("grant select, insert on customer to user;")
+
 		$initFile = fopen("tables.sql", 'r') or showAlert("Unable to open file tables.sql");
 		$fileString = fread($initFile, filesize("tables.sql"));
 		$sqlArr = preg_split("/;/", $fileString);
@@ -258,30 +267,47 @@
 		OCICommit($db_conn);
 	}
 
-	function handleAddCustomer() {
-		global $db_conn;
+	function populateTables() {
+        global $db_conn;
+        $popFile = fopen("InsertionsForPopulation.sql", 'r') or showAlert("Unable to open file tables.sql");
+        $fileString = fread($popFile, filesize("InsertionsForPopulation.sql"));
+        $sqlArr = preg_split("/;/", $fileString);
 
-		$result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
+        foreach($sqlArr as &$statement) {
+            if(strlen($statement) > 1) {
+                executeSQL($statement, "populateTablesSuccess");
+            }
+        }
+
+        fclose($popFile);
+        OCICommit($db_conn);
+    }
+
+	function handleAddCustomer() {
+        global $db_conn;
+
+        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
 		VALUES ('" . $_POST['cNum'] . "', '" . $_POST['cName'] . "')", "addCustomerSuccess");
-		OCICommit($db_conn);
-	}
+
+        OCICommit($db_conn);
+    }
 	
 	function handleAddShift() {
 		global $db_conn;
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
-		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")",
+		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "')",
 		"addShiftSuccess");
-		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)");
+		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
 	function handleAddBusiness() {
 	    global $db_conn;
 
-	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
-        $_POST['url'] . "," . $_POST['name'] . "," . $_POST['capacity'] . "," . $_POST['bid'] . "," .
-        $_POST['address'] . ")");
+	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('" . $_POST['url'] . "
+	    ', '" . $_POST['name'] . "', '" . $_POST['capacity'] . "', '" . $_POST['bid'] . "', '" . $_POST['address'] . "')",
+	    "addBusinessSuccess");
 
 	    OCICommit($db_conn);
     }
@@ -290,7 +316,8 @@
 	    global $db_conn;
 
 	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
-            $_POST['tid'] . "," . $_POST['bid'] . "," . $_POST['amount'] . "," . $_POST['date'] .  ")");
+            $_POST['tid'] . "," . $_POST['bid'] . "," . $_POST['amount'] . "," . $_POST['date'] .  ")",
+            "AddTransactionSuccess");
 
 	    OCICommit($db_conn);
     }
@@ -355,7 +382,9 @@
 		if(connectDB()) {
 			if(array_key_exists('initTables', $_GET)) {
 				initTables();
-			} else if (array_key_exists('displayScheduledShift', $_GET)) {
+			} else if (array_key_exists('populateTables', $_GET)) {
+			    populateTables();
+			}else if (array_key_exists('displayScheduledShift', $_GET)) {
 				displayScheduledShift();
 			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
 				displayVisitingCustomer();
