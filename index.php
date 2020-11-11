@@ -37,7 +37,45 @@
 					</div>
 					<input class="submit button" type="submit" value="Add" name="addCustomer">
 				</form>
-			<div id="addCustomerSuccess"/>
+				<div id="addCustomerSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Add Warning Violation</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Law: </p>
+						<input type="text" name="law">
+					</div>
+					<div>
+						<p>Description: </p>
+						<input type="textarea" name="desc">
+					</div>
+					<div>
+						<p>Level: </p>
+						<input type="text" name="severity">
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addWarning">
+				</form>
+				<div id="addWarningSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Add Fine Violation</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Law: </p>
+						<input type="text" name="law">
+					</div>
+					<div>
+						<p>Description: </p>
+						<input type="textarea" name="desc">
+					</div>
+					<div>
+						<p>Amount</p>
+						<input type="text" name="amount">
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addFine">
+				</form>
+				<div id="addFineSuccess"/>
 			</div>
 			<div class="op-container">
 				<h2>Add Shift</h2>
@@ -78,6 +116,9 @@
 						<select id="tableSelect" name="table">
 							<option value="scheduledShift">ScheduledShift</option>
 							<option value="customerPartyContact">CustomerPartyContact</option>
+							<option value="violation">Violation</option>
+							<option value="warning">Warning</option>
+							<option value="fine">Fine</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
@@ -196,6 +237,30 @@
 		OCICommit($db_conn);
 	}
 
+	function handleAddWarning() {
+		global $db_conn;
+		// TODO: Check if law already exists before setting it
+		executeSQL("INSERT INTO Violation(law, description)
+					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
+					"addWarningSuccess");
+		executeSQL("INSERT INTO Warning(law, severity)
+					VALUES ('". $_POST['law'] . "', " . $_POST['severity'] . ")",
+					"addWarningSuccess");
+		OCICommit($db_conn);
+	}
+
+	function handleAddFine() {
+		global $db_conn;
+		// TODO: Check if law already exists before setting it
+		executeSQL("INSERT INTO Violation(law, description)
+					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
+					"addFineSuccess");
+		executeSQL("INSERT INTO Fine(law, amount)
+					VALUES ('". $_POST['law'] . "', " . $_POST['amount'] . ")",
+					"addFineSuccess");
+		OCICommit($db_conn);
+	}
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -234,6 +299,24 @@
 				$altHeaders = ["Name", "Phone Number"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
+			case "violation":
+				$result = executeSQL("SELECT * FROM Violation", "displayTableSuccess");
+				$headers = ["law", "description"];
+				$altHeaders = ["Law", "Description"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "warning":
+				$result = executeSQL("SELECT * FROM Warning", "displayTableSuccess");
+				$headers = ["law", "severity"];
+				$altHeaders = ["Law", "Severity"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "fine":
+				$result = executeSQL("SELECT * FROM Fine", "displayTableSuccess");
+				$headers = ["law", "amount"];
+				$altHeaders = ["Law", "Amount"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
 		}
 	}
 
@@ -245,6 +328,10 @@
 				handleAddShift();
 			} else if (array_key_exists('displayTable', $_POST)) {
 				handleDisplayTable();
+			} else if (array_key_exists('addWarning', $_POST)) {
+				handleAddWarning();
+			} else if (array_key_exists('addFine', $_POST)) {
+				handleAddFine();
 			}
 			disconnectDB();
 		}
