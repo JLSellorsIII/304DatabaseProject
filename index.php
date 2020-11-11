@@ -40,6 +40,30 @@
 				<div id="addCustomerSuccess"/>
 			</div>
 			<div class="op-container">
+				<h2>Add Visiting Customer</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Time: </p>
+						<input type="datetime-local" name="startTime">
+					</div>
+					<div>
+						<p>Duration (hours): </p>
+						<input type="number" name="duration">
+					</div>
+					<div>
+						<p>Customer: </p>
+						<select id="customerSelect" name="customer"> </select>
+					</div>
+					<div>
+						<p>Business: </p>
+						<select id="businessSelect" name="business">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addVisitor">
+				</form>
+				<div id="addVisitorSuccess"/>
+			</div>
+			<div class="op-container">
 				<h2>Add Warning Violation</h2>
 				<form method="POST" action="index.php">
 					<div>
@@ -119,6 +143,8 @@
 							<option value="violation">Violation</option>
 							<option value="warning">Warning</option>
 							<option value="fine">Fine</option>
+							<option value="visitedLength">VisitedLength</option>
+							<option value="visitedTime">VisitedTime</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
@@ -130,11 +156,19 @@
 
 	 <script type="text/javascript">
 		function printToElement(id, text) {
-			id.innerHTML += text;
+			if(typeof id === "string") {
+				document.getElementById(id).innerHTML += text;
+			}else {
+				id.innerHTML += text;
+			}
 		}
 
 		function resetElementText(id) {
-			document.getElementById(id).innerHTML = '';
+			if(typeof id === "string") {
+				document.getElementById(id).innerHTML = '';
+			}else {
+			id.innerHTML = '';
+			}
 		}
 	 </script>
 <?php
@@ -183,22 +217,28 @@
 
 		if (!$statement) {
 			$e = OCI_Error($db_conn);
-			callJSFunc("printToElement(" . $successElement .
-					   ", `<p class='error'> Error parsing request.<br>" .
-					   htmlentities($e['message']) . "</p>`);");
+			if($successElement != null) {
+				callJSFunc("printToElement(" . $successElement .
+						", `<p class='error'> Error parsing request.<br>" .
+						htmlentities($e['message']) . "</p>`);");
+			}
 			return $statement;
 		}
 
 		$r = OCIExecute($statement, OCI_DEFAULT);
 		if(!$r) {
 			$e = oci_error($statement);
-			callJSFunc("printToElement(" . $successElement .
-					   ", `<p class='error'> Error executing request.<br>" .
-					   htmlentities($e['message']) . "</p>`);");
+			if($successElement != null) {
+				callJSFunc("printToElement(" . $successElement .
+						", `<p class='error'> Error executing request.<br>" .
+						htmlentities($e['message']) . "</p>`);");
+			}
 			return $statement;
 		}
 
-		callJSFunc("printToElement(" . $successElement . ", `<p class='success'> Your request was executed successfully.</p>`)");
+		if($successElement != null) {
+			callJSFunc("printToElement(" . $successElement . ", `<p class='success'> Your request was executed successfully.</p>`)");
+		}
 		return $statement;
 
 	}
@@ -261,6 +301,29 @@
 		OCICommit($db_conn);
 	}
 
+	function handleAddVisitor() {
+		//TODO: debug "not a valid month", waiting for addBusiness
+		global $db_conn;
+		$endTime = $_POST['startTime'] + $_POST['duration'];
+		$startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+		$endTime = date("Y-m-d H:i:s",
+						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
+		executeSQL("INSERT INTO VisitedTime(arrivalTime, pNumber, bid, duration)
+					VALUES ('"
+				   . $startTime . "', '"
+				   . $_POST['customer'] . "', '"
+				   . $_POST['business'] . "', '"
+				   . $_POST['duration'] . "')",
+					"addVisitorSuccess");
+		executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
+					VALUES ('"
+				   . $startTime . "', '"
+				   . $_POST['duration'] . "', '"
+				   . $endTime . "')",
+					"addVisitorSuccess");
+		OCICommit($db_conn);
+	}
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -317,6 +380,18 @@
 				$altHeaders = ["Law", "Amount"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
+			case "visitedLength":
+				$result = executeSQL("SELECT * FROM VisitedLength", "displayTableSuccess");
+				$headers = ["arrivalTime", "Duration", "endTime"];
+				$altHeaders = ["Start Time", "Duration", "End Time"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "visitedTime":
+				$result = executeSQL("SELECT * FROM VisitedTime", "displayTableSuccess");
+				$headers = ["arrivalTime", "pNumber", "bid", "Duration"];
+				$altHeaders = ["Start Time", "Phone Number", "Business ID", "Duration"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
 		}
 	}
 
@@ -332,6 +407,8 @@
 				handleAddWarning();
 			} else if (array_key_exists('addFine', $_POST)) {
 				handleAddFine();
+			} else if (array_key_exists('addVisitor', $_POST)) {
+				handleAddVisitor();
 			}
 			disconnectDB();
 		}
@@ -352,5 +429,34 @@
 	}else if($_GET) {
 		handleGETRequest();
 	}
+
+	function fillCustomerSelect() {
+		if(connectDB()) {
+			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
+			$optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["PNUMBER"] . "'>" .
+								$row["NAME"] . " - " . $row["PNUMBER"] . "</option>";
+			}
+			callJSFunc("printToElement('customerSelect', `" . $optionString . "`)");
+		}
+		disconnectDB();
+	}
+
+	function fillBusinessSelect() {
+		if(connectDB()) {
+			$result = executeSQL("SELECT * FROM Business", null);
+			$optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["BID"] . "'>" .
+					$row["NAME"] . " - " . $row["ADDRESS"] . "</option>";
+			}
+			callJSFunc("printToElement('businessSelect', `" . $optionString . "`)");
+		}
+		disconnectDB();
+	}
+
+	fillCustomerSelect();
+	fillBusinessSelect();
 ?>
 </html>
