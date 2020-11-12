@@ -28,6 +28,7 @@
             </form>
             <div id="populateTablesSuccess"/>
 		</div>
+        </div>
 		<div id="additions">
 			<h1>Additions</h1>
 			<div class="op-container">
@@ -141,6 +142,7 @@
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 				<div id="addShiftSuccess"/>
+            </div>
 
                 <div class="op-container">
                     <h2>Add Business</h2>
@@ -186,7 +188,7 @@
                             <input type="text" name="amount">
                         </div>
                         <div>
-                            <p>date:</p>
+                            <p>date(dd.mmm.yyyy:hh:mm:ss):</p>
                             <input type="text" name="date">
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addTransaction">
@@ -194,7 +196,62 @@
                     <div id="addTransactionSuccess"/>
                 </div>
 
-			</div>
+                <div class="op-container">
+                    <h2>Add Covid Supplies</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>Quantity:</p>
+                            <input type="text" name="quantity">
+                        </div>
+                        <div>
+                            <p>CovidSupplies ID:</p>
+                            <input type="text" name="csid">
+                        </div>
+                        <div>
+                            <p>Business ID:</p>
+                            <input type="text" name="bid">
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addCovidSupplies">
+                    </form>
+                    <div id="addCovidSuppliesSuccess"/>
+                </div>
+
+                <div class="op-container">
+                    <h2>Add Perishable Consumable</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>Expiration Date (dd.mmm.yyyy:hh:mm:ss):</p>
+                            <input type="text" name="expirationDate">
+                        </div>
+                        <div>
+                            <p>ID:</p>
+                            <input type="text" name="cid">
+                        </div>
+                        <div>
+                            <p>Business ID:</p>
+                            <input type="text" name="bid">
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
+                    </form>
+                    <div id="addPerishableSuppliesSuccess"/>
+                </div>
+
+            <div class="op-container">
+                <h2>Add nonPerishable Consumable</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>ID:</p>
+                        <input type="text" name="cid">
+                    </div>
+                    <div>
+                        <p>Business ID:</p>
+                        <input type="text" name="bid">
+                    </div>
+                    <input class="submit button" type="submit" value="Add" name="addNonPerishableConsumable">
+                </form>
+                <div id="addNonPerishableSuppliesSuccess"/>
+            </div>
+
 		</div>
 		<div id="updates">
 			<h1>Updates</h1>
@@ -217,6 +274,7 @@
 							<option value="visitedLength">VisitedLength</option>
 							<option value="visitedTime">VisitedTime</option>
                             <option value="business">Business</option>
+                            <option value="transaction">Transaction</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
@@ -317,8 +375,6 @@
 
 	function initTables() {
 		global $db_conn;
-		$result = executeSQL("ALTER USER ora_omurovec quota unlimited on USERS");
-		$result = executeSQL("grant select, insert on customer to user");
 
 		$initFile = fopen("tables.sql", 'r') or showAlert("Unable to open file tables.sql");
 		$fileString = fread($initFile, filesize("tables.sql"));
@@ -396,12 +452,42 @@
     function handleAddTransaction() {
 	    global $db_conn;
 
-	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
-            $_POST['tid'] . "," . $_POST['bid'] . "," . $_POST['amount'] . "," . $_POST['date'] .  ")",
-            "AddTransactionSuccess");
+	    $result = executeSQL("INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('" .
+            $_POST['tid'] . "', '" . $_POST['bid'] . "', '" . $_POST['amount'] . "', '" . $_POST['date'] .  "')",
+            "addTransactionSuccess");
 
 	    OCICommit($db_conn);
     }
+
+    function handleAddCovidSupplies() {
+        global $db_conn;
+
+        $result = executeSQL("INSERT INTO CovidSupplies(quantity, csid, bid) VALUES ('" .
+            $_POST['quantity'] . "', '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+            "addCovidSuppliesSuccess");
+
+        OCICommit($db_conn);
+    }
+
+function handleAddNonPerishableConsumable() {
+    global $db_conn;
+
+    $result = executeSQL("INSERT INTO CovidSupplies(cid, bid) VALUES (
+ '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+        "addNonPerishableConsumableSuccess");
+
+    OCICommit($db_conn);
+}
+
+function handleAddPerishableConsumable() {
+    global $db_conn;
+
+    $result = executeSQL("INSERT INTO PerishableConsumable(expirationDate, cid, bid) VALUES ('" .
+        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['bid'] . "')",
+        "addPerishableConsumableSuccess");
+
+    OCICommit($db_conn);
+}
 
 	function handleAddFine() {
 		global $db_conn;
@@ -509,8 +595,14 @@
             case "business":
                 $result = executeSQL("SELECT * FROM Business" , "displayTableSuccess");
                 $headers = ["url", "name", "capacity", "bid", "address"];
-                $altHeaders = ["URL", "Business Name", "Capacity", "Business ID", "Address"];
-                printTable($result,$headers,$altHeaders,"mainTable");
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
+            case "transaction":
+                $result = executeSQL("SELECT * FROM RecordedTransaction", "displayTableSuccess");
+                $headers = ["tid", "bid", "amount", "transactionDate"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
                 break;
 		}
 	}
@@ -523,7 +615,6 @@
                 handleAddCustomer();
             } else if (array_key_exists("addShift", $_POST)) {
                 handleAddShift();
-
             } else if (array_key_exists('displayTable', $_POST)) {
                 handleDisplayTable();
             } else if (array_key_exists('addWarning', $_POST)) {
@@ -536,6 +627,12 @@
                 handleAddBusiness();
             } else if (array_key_exists("addTransaction", $_POST)) {
                 handleAddTransaction();
+            } else if (array_key_exists("addCovidSupplies", $_POST)) {
+                handleAddCovidSupplies();
+            } else if (array_key_exists("addNonPerishableConsumable", $_POST)) {
+                handleAddNonPerishableConsumable();
+            } else if (array_key_exists("addPerishableConsumable", $_POST)) {
+                handleAddPerishableConsumable();
             }
 
             disconnectDB();
