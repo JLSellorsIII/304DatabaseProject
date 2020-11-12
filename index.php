@@ -557,7 +557,6 @@
             }
 
 			disconnectDB();
-		}
 	}
 
 	function handleGETRequest() {
