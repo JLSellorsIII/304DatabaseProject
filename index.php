@@ -21,6 +21,12 @@
 				</form>
 			<div id="initTablesSuccess"/>
 			</div>
+            <div class="op-container">
+            <form method="GET" action="index.php">
+                <input type="hidden" value="populateTables" name="populateTables">
+                <input type="submit" class="button" value="Populate Tables" name="populateTables">
+            </form>
+            <div id="populateTablesSuccess"/>
 		</div>
 		<div id="additions">
 			<h1>Additions</h1>
@@ -120,9 +126,74 @@
 						<p>Wage: </p>
 						<input type="text" name="Wage">
 					</div>
+                    <div>
+                        <p>StartTime: </p>
+                        <input type="text" name="startTime">
+                    </div>
+                    <div>
+                        <p>EndTime: </p>
+                        <input type="text" name="endTime">
+                    </div>
+                    <div>
+                        <p>Duration: </p>
+                        <input type="text" name="duration">
+                    </div>
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 				<div id="addShiftSuccess"/>
+
+                <div class="op-container">
+                    <h2>Add Business</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>url: </p>
+                            <input type="text" name="url">
+                        </div>
+                        <div>
+                            <p>name: </p>
+                            <input type="text" name="name">
+                        </div>
+                        <div>
+                            <p>capacity: </p>
+                            <input type="text" name="capacity">
+                        </div>
+                        <div>
+                            <p>business ID: </p>
+                            <input type="text" name="bid">
+                        </div>
+                        <div>
+                            <p>Address: </p>
+                            <input type="text" name="address">
+                        </div>
+                        <input type="submit" class="submit button" value="Add" name="addBusiness">
+                    </form>
+                    <div id="addBusinessSuccess"/>
+                </div>
+
+                <div class="op-container">
+                    <h2>Add Transaction</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>transaction ID:</p>
+                            <input type="text" name="tid">
+                        </div>
+                        <div>
+                            <p>BusinessID:</p>
+                            <input type="text" name="bid">
+                        </div>
+                        <div>
+                            <p>amount:</p>
+                            <input type="text" name="amount">
+                        </div>
+                        <div>
+                            <p>date:</p>
+                            <input type="text" name="date">
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addTransaction">
+                    </form>
+                    <div id="addTransactionSuccess"/>
+                </div>
+
 			</div>
 		</div>
 		<div id="updates">
@@ -151,6 +222,16 @@
 				<div id="displayTableSuccess"/>
 				<div id="mainTable"/>
 			</div>
+
+            <div class="op-container">
+                <h2>Display the Tuples in Business Table</h2>
+                <form method="GET" action="index.php">
+                    <input type="hidden" id="displayBusinesses" name="displayBusinesses">
+                    <input type="submit" class="button" value="Get" name="displayBusinesses"></p>
+                </form>
+                <div id="displayBusinessesSuccess"/>
+            </div>
+
 		</div>
 	</body>
 
@@ -245,6 +326,9 @@
 
 	function initTables() {
 		global $db_conn;
+		$result = executeSQL("ALTER USER ora_omurovec quota unlimited on USERS");
+		$result = executeSQL("grant select, insert on customer to user");
+
 		$initFile = fopen("tables.sql", 'r') or showAlert("Unable to open file tables.sql");
 		$fileString = fread($initFile, filesize("tables.sql"));
 		$sqlArr = preg_split("/;/", $fileString);
@@ -260,22 +344,41 @@
 		OCICommit($db_conn);
 	}
 
-	function handleAddCustomer() {
-		global $db_conn;
+	function populateTables() {
+        global $db_conn;
+        $popFile = fopen("InsertionsForPopulation.sql", 'r') or showAlert("Unable to open file tables.sql");
+        $fileString = fread($popFile, filesize("InsertionsForPopulation.sql"));
+        $sqlArr = preg_split("/;/", $fileString);
 
-		$result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
+        foreach($sqlArr as &$statement) {
+            if(strlen($statement) > 1) {
+                executeSQL($statement, "populateTablesSuccess");
+            }
+        }
+
+        fclose($popFile);
+        OCICommit($db_conn);
+    }
+
+	function handleAddCustomer() {
+        global $db_conn;
+
+        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
 		VALUES ('" . $_POST['cNum'] . "', '" . $_POST['cName'] . "')", "addCustomerSuccess");
-		OCICommit($db_conn);
-	}
+
+        OCICommit($db_conn);
+    }
 	
 	function handleAddShift() {
 		global $db_conn;
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
-		VALUES (" . $_POST['shiftID'] . ", " . $_POST['bid'] . ", " . $_POST['email'] . ", " . $_POST['Wage'] . ")",
+		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "')",
 		"addShiftSuccess");
+		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
+
 
 	function handleAddWarning() {
 		global $db_conn;
@@ -288,6 +391,26 @@
 					"addWarningSuccess");
 		OCICommit($db_conn);
 	}
+
+	function handleAddBusiness() {
+	    global $db_conn;
+
+	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('" . $_POST['url'] . "
+	    ', '" . $_POST['name'] . "', '" . $_POST['capacity'] . "', '" . $_POST['bid'] . "', '" . $_POST['address'] . "')",
+	    "addBusinessSuccess");
+
+	    OCICommit($db_conn);
+    }
+
+    function handleAddTransaction() {
+	    global $db_conn;
+
+	    $result = executeSQL("INSERT INTO Business(url,name,capacity,bid,address) VALUES (" .
+            $_POST['tid'] . "," . $_POST['bid'] . "," . $_POST['amount'] . "," . $_POST['date'] .  ")",
+            "AddTransactionSuccess");
+
+	    OCICommit($db_conn);
+    }
 
 	function handleAddFine() {
 		global $db_conn;
@@ -395,12 +518,28 @@
 		}
 	}
 
+	function displayBusinesses() {
+	    $result = executeSQL("SELECT * FROM Business", "displayBusinessesSuccess");
+	    $elementID = "BusinessesTable";
+	    $tableString = "";
+
+        $tableString .= '<table><tr><th>url</th><th>name</th><th>capacity</th><th>bid</th><th>address</th></tr>';
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td>
+                <td>' . $row[2] . '</td><td>' . $row[3] . '</td><td>' . $row[4] . '</td></tr>';
+        }
+        $tableString .= '</table>';
+
+        callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
+    }
+
 	function handlePOSTRequest() {
 		if(connectDB()) {
 			if(array_key_exists("addCustomer", $_POST)) {
 				handleAddCustomer();
 			} else if(array_key_exists("addShift", $_POST)) {
 				handleAddShift();
+
 			} else if (array_key_exists('displayTable', $_POST)) {
 				handleDisplayTable();
 			} else if (array_key_exists('addWarning', $_POST)) {
@@ -410,6 +549,13 @@
 			} else if (array_key_exists('addVisitor', $_POST)) {
 				handleAddVisitor();
 			}
+
+			} else if(array_key_exists("addBusiness", $_POST)) {
+			    handleAddBusiness();
+            } else if(array_key_exists("addTransaction" , $_POST)) {
+			    handleAddTransaction();
+            }
+
 			disconnectDB();
 		}
 	}
@@ -418,10 +564,11 @@
 		if(connectDB()) {
 			if(array_key_exists('initTables', $_GET)) {
 				initTables();
+			} else if (array_key_exists('populateTables', $_GET)) {
+			    populateTables();
 			}
 			disconnectDB();
 		}
-
 	}
 
 	if($_POST) {
