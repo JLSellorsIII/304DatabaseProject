@@ -511,6 +511,7 @@
                 $headers = ["url", "name", "capacity", "bid", "address"];
                 $altHeaders = ["URL", "Business Name", "Capacity", "Business ID", "Address"];
                 printeTable($result,$headers,$altHeaders,"mainTable");
+                break;
 		}
 	}
 
