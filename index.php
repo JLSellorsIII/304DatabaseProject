@@ -533,31 +533,31 @@
         callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
     }
 
-	function handlePOSTRequest() {
-		if(connectDB()) {
-			if(array_key_exists("addCustomer", $_POST)) {
-				handleAddCustomer();
-			} else if(array_key_exists("addShift", $_POST)) {
-				handleAddShift();
+	function handlePOSTRequest()
+    {
+        if (connectDB()) {
+            if (array_key_exists("addCustomer", $_POST)) {
+                handleAddCustomer();
+            } else if (array_key_exists("addShift", $_POST)) {
+                handleAddShift();
 
-			} else if (array_key_exists('displayTable', $_POST)) {
-				handleDisplayTable();
-			} else if (array_key_exists('addWarning', $_POST)) {
-				handleAddWarning();
-			} else if (array_key_exists('addFine', $_POST)) {
-				handleAddFine();
-			} else if (array_key_exists('addVisitor', $_POST)) {
-				handleAddVisitor();
-			}
-
-			} else if(array_key_exists("addBusiness", $_POST)) {
-			    handleAddBusiness();
-            } else if(array_key_exists("addTransaction" , $_POST)) {
-			    handleAddTransaction();
+            } else if (array_key_exists('displayTable', $_POST)) {
+                handleDisplayTable();
+            } else if (array_key_exists('addWarning', $_POST)) {
+                handleAddWarning();
+            } else if (array_key_exists('addFine', $_POST)) {
+                handleAddFine();
+            } else if (array_key_exists('addVisitor', $_POST)) {
+                handleAddVisitor();
+            } else if (array_key_exists("addBusiness", $_POST)) {
+                handleAddBusiness();
+            } else if (array_key_exists("addTransaction", $_POST)) {
+                handleAddTransaction();
             }
 
-			disconnectDB();
-	}
+            disconnectDB();
+        }
+    }
 
 	function handleGETRequest() {
 		if(connectDB()) {
