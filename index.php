@@ -216,22 +216,13 @@
 							<option value="fine">Fine</option>
 							<option value="visitedLength">VisitedLength</option>
 							<option value="visitedTime">VisitedTime</option>
+                            <option value="business">Business</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
 				<div id="displayTableSuccess"/>
 				<div id="mainTable"/>
 			</div>
-
-            <div class="op-container">
-                <h2>Display the Tuples in Business Table</h2>
-                <form method="GET" action="index.php">
-                    <input type="hidden" id="displayBusinesses" name="displayBusinesses">
-                    <input type="submit" class="button" value="Get" name="displayBusinesses"></p>
-                </form>
-                <div id="displayBusinessesSuccess"/>
-            </div>
-
 		</div>
 	</body>
 
@@ -515,23 +506,14 @@
 				$altHeaders = ["Start Time", "Phone Number", "Business ID", "Duration"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
+            case "business":
+                $result = executeSQL("SELECT * FROM Business" , "displayTableSuccess");
+                $headers = ["url", "name", "capacity", "bid", "address"];
+                $altHeaders = ["URL", "Business Name", "Capacity", "Business ID", "Address"];
+                printeTable($result,$headers,$altHeaders,"mainTable");
 		}
 	}
 
-	function displayBusinesses() {
-	    $result = executeSQL("SELECT * FROM Business", "displayBusinessesSuccess");
-	    $elementID = "BusinessesTable";
-	    $tableString = "";
-
-        $tableString .= '<table><tr><th>url</th><th>name</th><th>capacity</th><th>bid</th><th>address</th></tr>';
-        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            $tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td>
-                <td>' . $row[2] . '</td><td>' . $row[3] . '</td><td>' . $row[4] . '</td></tr>';
-        }
-        $tableString .= '</table>';
-
-        callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
-    }
 
 	function handlePOSTRequest()
     {
