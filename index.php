@@ -43,7 +43,69 @@
 					</div>
 					<input class="submit button" type="submit" value="Add" name="addCustomer">
 				</form>
-			<div id="addCustomerSuccess"/>
+				<div id="addCustomerSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Add Visiting Customer</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Time: </p>
+						<input type="datetime-local" name="startTime">
+					</div>
+					<div>
+						<p>Duration (hours): </p>
+						<input type="number" name="duration">
+					</div>
+					<div>
+						<p>Customer: </p>
+						<select id="customerSelect" name="customer"> </select>
+					</div>
+					<div>
+						<p>Business: </p>
+						<select id="businessSelect" name="business">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addVisitor">
+				</form>
+				<div id="addVisitorSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Add Warning Violation</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Law: </p>
+						<input type="text" name="law">
+					</div>
+					<div>
+						<p>Description: </p>
+						<input type="textarea" name="desc">
+					</div>
+					<div>
+						<p>Level: </p>
+						<input type="text" name="severity">
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addWarning">
+				</form>
+				<div id="addWarningSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Add Fine Violation</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Law: </p>
+						<input type="text" name="law">
+					</div>
+					<div>
+						<p>Description: </p>
+						<input type="textarea" name="desc">
+					</div>
+					<div>
+						<p>Amount</p>
+						<input type="text" name="amount">
+					</div>
+					<input class="submit button" type="submit" value="Add" name="addFine">
+				</form>
+				<div id="addFineSuccess"/>
 			</div>
 			<div class="op-container">
 				<h2>Add Shift</h2>
@@ -143,21 +205,22 @@
 		<div id="queries">
 			<h1>Queries</h1>
 			<div class="op-container">
-				<h2>Display the Tuples in Visiting Customer Table</h2>
-				<form method="GET" action="index.php">
-					<input type="hidden" id="displayVisitingCustomer" name="displayVisitingCustomer">
-					<input type="submit" class="button" value="Get" name="displayVisitingCustomer"></p>
+				<h2>Display the Tuples in Selected Table</h2>
+				<form method="POST" action="index.php">
+					<input type="hidden" id="displayTable" name="displaySelectedTable">
+						<select id="tableSelect" name="table">
+							<option value="scheduledShift">ScheduledShift</option>
+							<option value="customerPartyContact">CustomerPartyContact</option>
+							<option value="violation">Violation</option>
+							<option value="warning">Warning</option>
+							<option value="fine">Fine</option>
+							<option value="visitedLength">VisitedLength</option>
+							<option value="visitedTime">VisitedTime</option>
+						</select>
+					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
-				<div id="displayVisitingCustomerSuccess"/>
-				<div id="visitingCustomerTable"/>
-			</div>
-			<div class="op-container">
-				<h2>Display the Tuples in Scheduled Shift Table</h2>
-				<form method="GET" action="index.php">
-					<input type="hidden" id="displayScheduledShift" name="displayScheduledShift">
-					<input type="submit" class="button" value="Get" name="displayScheduledShift"></p>
-				</form>
-				<div id="displayScheduledShiftSuccess"/>
+				<div id="displayTableSuccess"/>
+				<div id="mainTable"/>
 			</div>
 
             <div class="op-container">
@@ -174,11 +237,19 @@
 
 	 <script type="text/javascript">
 		function printToElement(id, text) {
-			id.innerHTML += text;
+			if(typeof id === "string") {
+				document.getElementById(id).innerHTML += text;
+			}else {
+				id.innerHTML += text;
+			}
 		}
 
 		function resetElementText(id) {
-			document.getElementById(id).innerHTML = '';
+			if(typeof id === "string") {
+				document.getElementById(id).innerHTML = '';
+			}else {
+			id.innerHTML = '';
+			}
 		}
 	 </script>
 <?php
@@ -227,22 +298,28 @@
 
 		if (!$statement) {
 			$e = OCI_Error($db_conn);
-			callJSFunc("printToElement(" . $successElement .
-					   ", `<p class='error'> Error parsing request.<br>" .
-					   htmlentities($e['message']) . "</p>`);");
+			if($successElement != null) {
+				callJSFunc("printToElement(" . $successElement .
+						", `<p class='error'> Error parsing request.<br>" .
+						htmlentities($e['message']) . "</p>`);");
+			}
 			return $statement;
 		}
 
 		$r = OCIExecute($statement, OCI_DEFAULT);
 		if(!$r) {
 			$e = oci_error($statement);
-			callJSFunc("printToElement(" . $successElement .
-					   ", `<p class='error'> Error executing request.<br>" .
-					   htmlentities($e['message']) . "</p>`);");
+			if($successElement != null) {
+				callJSFunc("printToElement(" . $successElement .
+						", `<p class='error'> Error executing request.<br>" .
+						htmlentities($e['message']) . "</p>`);");
+			}
 			return $statement;
 		}
 
-		callJSFunc("printToElement(" . $successElement . ", `<p class='success'> Your request was executed successfully.</p>`)");
+		if($successElement != null) {
+			callJSFunc("printToElement(" . $successElement . ", `<p class='success'> Your request was executed successfully.</p>`)");
+		}
 		return $statement;
 
 	}
@@ -302,6 +379,19 @@
 		OCICommit($db_conn);
 	}
 
+
+	function handleAddWarning() {
+		global $db_conn;
+		// TODO: Check if law already exists before setting it
+		executeSQL("INSERT INTO Violation(law, description)
+					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
+					"addWarningSuccess");
+		executeSQL("INSERT INTO Warning(law, severity)
+					VALUES ('". $_POST['law'] . "', " . $_POST['severity'] . ")",
+					"addWarningSuccess");
+		OCICommit($db_conn);
+	}
+
 	function handleAddBusiness() {
 	    global $db_conn;
 
@@ -322,30 +412,110 @@
 	    OCICommit($db_conn);
     }
 
-	function displayScheduledShift() {
-		$result = executeSQL("SELECT * FROM ScheduledShift", "displayScheduledShiftSuccess");
-		echo "<table>";
-		echo "<tr><th>ID</th><th>Name</th></tr>";
-
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
-		}
-
-		echo "</table>";
+	function handleAddFine() {
+		global $db_conn;
+		// TODO: Check if law already exists before setting it
+		executeSQL("INSERT INTO Violation(law, description)
+					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
+					"addFineSuccess");
+		executeSQL("INSERT INTO Fine(law, amount)
+					VALUES ('". $_POST['law'] . "', " . $_POST['amount'] . ")",
+					"addFineSuccess");
+		OCICommit($db_conn);
 	}
 
-	function displayVisitingCustomer() {
-		$result = executeSQL("SELECT * FROM customerPartyContact", "displayVisitingCustomerSuccess");
-		$elementID = "visitingCustomerTable";
-		$tableString = "";
+	function handleAddVisitor() {
+		//TODO: debug "not a valid month", waiting for addBusiness
+		global $db_conn;
+		$endTime = $_POST['startTime'] + $_POST['duration'];
+		$startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+		$endTime = date("Y-m-d H:i:s",
+						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
+		executeSQL("INSERT INTO VisitedTime(arrivalTime, pNumber, bid, duration)
+					VALUES ('"
+				   . $startTime . "', '"
+				   . $_POST['customer'] . "', '"
+				   . $_POST['business'] . "', '"
+				   . $_POST['duration'] . "')",
+					"addVisitorSuccess");
+		executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
+					VALUES ('"
+				   . $startTime . "', '"
+				   . $_POST['duration'] . "', '"
+				   . $endTime . "')",
+					"addVisitorSuccess");
+		OCICommit($db_conn);
+	}
 
-		$tableString .= '<table><tr><th>Name</th><th>Phone Number</th></tr>';
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			$tableString .= '<tr><td>' . $row[0] . '</td><td>' . $row[1] . '</td></tr>';
+	function printTable($result, $headers, $altHeaders, $elem) {
+		$tableString = "<table><tr>";
+		if($altHeaders != null) {
+			foreach($altHeaders as &$header) {
+				$tableString .= "<th>" . $header . "</th>";
+			}
+		}else {
+			foreach($headers as &$header) {
+				$tableString .= "<th>" . $header . "</th>";
+			}
 		}
-		$tableString .= '</table>';
+		$tableString .= "</tr>";
 
-		callJSFunc("printToElement(" . $elementID . ", '" . $tableString . "');");
+		while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			$tableString .= "<tr>";
+			foreach($headers as &$header) {
+				$tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
+			}
+			$tableString .= "</tr>";
+		}
+		$tableString .= "</table>";
+		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
+	}
+
+	function handleDisplayTable() {
+		switch($_POST['table']) {
+			case "scheduledShift":
+				$result = executeSQL("SELECT * FROM ScheduledShift", "displayTableSuccess");
+				$headers = ["shiftID", "bid", "Email", "Wage"];
+				$altHeaders = null;
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "customerPartyContact":
+				$result = executeSQL("SELECT * FROM CustomerPartyContact", "displayTableSuccess");
+				$headers = ["name", "pNumber"];
+				$altHeaders = ["Name", "Phone Number"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "violation":
+				$result = executeSQL("SELECT * FROM Violation", "displayTableSuccess");
+				$headers = ["law", "description"];
+				$altHeaders = ["Law", "Description"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "warning":
+				$result = executeSQL("SELECT * FROM Warning", "displayTableSuccess");
+				$headers = ["law", "severity"];
+				$altHeaders = ["Law", "Severity"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "fine":
+				$result = executeSQL("SELECT * FROM Fine", "displayTableSuccess");
+				$headers = ["law", "amount"];
+				$altHeaders = ["Law", "Amount"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "visitedLength":
+				$result = executeSQL("SELECT * FROM VisitedLength", "displayTableSuccess");
+				$headers = ["arrivalTime", "Duration", "endTime"];
+				$altHeaders = ["Start Time", "Duration", "End Time"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "visitedTime":
+				$result = executeSQL("SELECT * FROM VisitedTime", "displayTableSuccess");
+				$headers = ["arrivalTime", "pNumber", "bid", "Duration"];
+				$altHeaders = ["Start Time", "Phone Number", "Business ID", "Duration"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+		}
 	}
 
 	function displayBusinesses() {
@@ -369,11 +539,23 @@
 				handleAddCustomer();
 			} else if(array_key_exists("addShift", $_POST)) {
 				handleAddShift();
+
+			} else if (array_key_exists('displayTable', $_POST)) {
+				handleDisplayTable();
+			} else if (array_key_exists('addWarning', $_POST)) {
+				handleAddWarning();
+			} else if (array_key_exists('addFine', $_POST)) {
+				handleAddFine();
+			} else if (array_key_exists('addVisitor', $_POST)) {
+				handleAddVisitor();
+			}
+
 			} else if(array_key_exists("addBusiness", $_POST)) {
 			    handleAddBusiness();
             } else if(array_key_exists("addTransaction" , $_POST)) {
 			    handleAddTransaction();
             }
+
 			disconnectDB();
 		}
 	}
@@ -384,13 +566,7 @@
 				initTables();
 			} else if (array_key_exists('populateTables', $_GET)) {
 			    populateTables();
-			}else if (array_key_exists('displayScheduledShift', $_GET)) {
-				displayScheduledShift();
-			} else if (array_key_exists('displayVisitingCustomer', $_GET)) {
-				displayVisitingCustomer();
-			} else if (array_key_exists('displayBusinesses', $_GET)) {
-			    displayBusinesses();
-            }
+			}
 			disconnectDB();
 		}
 	}
@@ -400,5 +576,34 @@
 	}else if($_GET) {
 		handleGETRequest();
 	}
+
+	function fillCustomerSelect() {
+		if(connectDB()) {
+			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
+			$optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["PNUMBER"] . "'>" .
+								$row["NAME"] . " - " . $row["PNUMBER"] . "</option>";
+			}
+			callJSFunc("printToElement('customerSelect', `" . $optionString . "`)");
+		}
+		disconnectDB();
+	}
+
+	function fillBusinessSelect() {
+		if(connectDB()) {
+			$result = executeSQL("SELECT * FROM Business", null);
+			$optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["BID"] . "'>" .
+					$row["NAME"] . " - " . $row["ADDRESS"] . "</option>";
+			}
+			callJSFunc("printToElement('businessSelect', `" . $optionString . "`)");
+		}
+		disconnectDB();
+	}
+
+	fillCustomerSelect();
+	fillBusinessSelect();
 ?>
 </html>
