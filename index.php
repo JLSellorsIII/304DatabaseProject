@@ -250,7 +250,7 @@
 	function initTables() {
 		global $db_conn;
 		$result = executeSQL("ALTER USER ora_omurovec quota unlimited on USERS");
-		$result = executeSQL("grant select, insert on customer to user;")
+		$result = executeSQL("grant select, insert on customer to user");
 
 		$initFile = fopen("tables.sql", 'r') or showAlert("Unable to open file tables.sql");
 		$fileString = fread($initFile, filesize("tables.sql"));
