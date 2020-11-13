@@ -195,6 +195,22 @@
                     </form>
                     <div id="addTransactionSuccess"/>
                 </div>
+				
+				<div class="op-container">
+                    <h2>Add Account</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>Email Address:</p>
+                            <input type="text" name="email">
+                        </div>
+                        <div>
+                            <p>Password:</p>
+                            <input type="text" name="password">
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addAccount">
+                    </form>
+                    <div id="addAccountSuccess"/>
+                </div>
 
                 <div class="op-container">
                     <h2>Add Covid Supplies</h2>
@@ -273,11 +289,12 @@
 							<option value="fine">Fine</option>
 							<option value="visitedLength">VisitedLength</option>
 							<option value="visitedTime">VisitedTime</option>
-                            <option value="business">Business</option>
-                            <option value="transaction">Transaction</option>
-                            <option value="covidSupplies">CovidSupplies</option>
-                            <option value="nonPerishableConsumables">NonPerishableConsumables</option>
-                            <option value="perishableConsumables">PerishableConsumables</option>
+              <option value="business">Business</option>
+              <option value="transaction">Transaction</option>
+              <option value="covidSupplies">CovidSupplies</option>
+              <option value="nonPerishableConsumables">NonPerishableConsumables</option>
+              <option value="perishableConsumables">PerishableConsumables</option>
+							<option value="Account">Account</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
@@ -324,7 +341,7 @@
 	function connectDB() {
 		global $db_conn;
 
-		$db_conn = OCILogon("ora_omurovec", "a89448617",  "dbhost.students.cs.ubc.ca:1522/stu");
+		$db_conn = OCILogon("ora_li4alex", "a46338117",  "dbhost.students.cs.ubc.ca:1522/stu");
 
 		if($db_conn) {
 			showAlert("DB Connected");
@@ -526,6 +543,15 @@ function handleAddPerishableConsumable() {
 					"addVisitorSuccess");
 		OCICommit($db_conn);
 	}
+	
+	function handleAddAccount() {
+		global $db_conn;
+		// TODO: Check if account already exists before setting it
+		executeSQL("INSERT INTO Account(email, password)
+					VALUES ('". $_POST['email'] . "', '" . $_POST['password'] . "')",
+					"addAccountSuccess");
+		OCICommit($db_conn);
+	}
 
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
@@ -595,9 +621,10 @@ function handleAddPerishableConsumable() {
 				$altHeaders = ["Start Time", "Phone Number", "Business ID", "Duration"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
-            case "business":
-                $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
-                $headers = ["url", "name", "capacity", "bid", "address"];
+
+      case "business":
+        $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
+        $headers = ["url", "name", "capacity", "bid", "address"];
                 $altHeaders = ["url", "Business", "Capacity", "Business ID", "Address"];
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
@@ -625,6 +652,13 @@ function handleAddPerishableConsumable() {
                 $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
+			case "Account":
+				// For testing; probably should not display Password in production
+				$result = executeSQL("SELECT * FROM Account", "displayTableSuccess");
+				$headers = ["email", "password"];
+				$altHeaders = ["Email Address", "Password"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
 		}
 	}
 
@@ -654,7 +688,10 @@ function handleAddPerishableConsumable() {
                 handleAddNonPerishableConsumable();
             } else if (array_key_exists("addPerishableConsumable", $_POST)) {
                 handleAddPerishableConsumable();
-            }
+           
+            } else if (array_key_exists("addAccount", $_POST)) {
+				handleAddAccount();
+			}
 
             disconnectDB();
         }

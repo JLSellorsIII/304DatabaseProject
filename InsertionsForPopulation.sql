@@ -33,19 +33,19 @@ INSERT INTO Business(url, name, capacity,bid, address) VALUES
 
 
 INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES
-   ('11-sep-2001', 0001, 0001);
+   ('2001-09-11', 0001, 0001);
 
    INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES
-   ('06-jun-2002', 0002, 0002);
+   ('2002-06-06', 0002, 0002);
 
    INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES
-   ('23-dec-2023', 0003, 0003);
+   ('2023-12-23', 0003, 0003);
 
    INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES
-   ('30-jul-2020', 0004, 0004);
+   ('2020-07-30', 0004, 0004);
 
    INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES
-   ('07-jul-2007', 0005, 0005);
+   ('2007-07-07', 0005, 0005);
 
 INSERT INTO nonPerishableConsumables(cid, bid) VALUES
     (0006,0001);
@@ -97,15 +97,15 @@ INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
      (0005, 0003, 'student@ubc.ca', 011.93);
 
 INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0001,'2020-06-12 12:00:00','2020-06-12 20:00:00',08.00);
+    (0001, '2020-06-12 12:00:00', '2020-06-12 20:00:00',08.00);
 
-    INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
+INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
     (0002, '2020-06-12 12:30:00', '2020-06-12 17:00:00', 05.50);
 
-    INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0003, '2020-09-12 12:00:00', '2020-06-23 23:15',11.25);
+INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
+    (0003, '2020-09-12 12:00:00', '2020-06-23 23:15', 11.25);
 
-    INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
+INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
     (0004, '2020-07-12 08:00:00', '2020-07-12 16:00:00', 08.00);
 
     INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
@@ -281,11 +281,3 @@ INSERT INTO TracksPaid(bid,email,law,paid) VALUES
 
     INSERT INTO TracksPaid(bid,email,law,paid) VALUES
     (0001, 'official@gov.ca', 'Sanitizer', NULL);
-
-
-
-
-
-
-
-
