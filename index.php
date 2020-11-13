@@ -275,6 +275,9 @@
 							<option value="visitedTime">VisitedTime</option>
                             <option value="business">Business</option>
                             <option value="transaction">Transaction</option>
+                            <option value="covidSupplies">CovidSupplies</option>
+                            <option value="nonPerishableConsumables">NonPerishableConsumables</option>
+                            <option value="perishableConsumables">PerishableConsumables</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
@@ -552,7 +555,7 @@ function handleAddPerishableConsumable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
 				$result = executeSQL("SELECT * FROM ScheduledShift", "displayTableSuccess");
-				$headers = ["shiftID", "bid", "Email", "Wage"];
+				$headers = ["shiftID", "bid", "email", "Wage"];
 				$altHeaders = null;
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
@@ -593,14 +596,32 @@ function handleAddPerishableConsumable() {
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
             case "business":
-                $result = executeSQL("SELECT * FROM Business" , "displayTableSuccess");
+                $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
                 $headers = ["url", "name", "capacity", "bid", "address"];
-                $altHeaders = null;
+                $altHeaders = ["url", "Business", "Capacity", "Business ID", "Address"];
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
             case "transaction":
                 $result = executeSQL("SELECT * FROM RecordedTransaction", "displayTableSuccess");
                 $headers = ["tid", "bid", "amount", "transactionDate"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
+            case "covidSupplies":
+                $result = exectuteSQL("SELECT * FROM CovidSupplies", "displayTableSuccess");
+                $headers = ["quantity", "csid", "bid"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
+            case "nonPerishableConsumables":
+                $result = executeSQL("SELECT * FROM nonPerishableConsumables", "displayTableSuccess");
+                $headers = ["cid", "bid"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
+            case "perishableConsumables":
+                $result = executeSQL("SELECT * FROM PerishableConsumables", "displayTableSuccess");
+                $headers = ["expirationDate", "cid", "bid"];
                 $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
