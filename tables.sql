@@ -143,7 +143,7 @@ CREATE TABLE TracksDate
 (bid		INTEGER,
 email		VARCHAR(30),
 law		VARCHAR(50),
-violationDate	TIMESTAMP,
+violationDate	DATE,
 PRIMARY KEY (bid, email, law),
 FOREIGN KEY (bid) REFERENCES Business (bid)
 	/* ON UPDATE CASCADE */,
