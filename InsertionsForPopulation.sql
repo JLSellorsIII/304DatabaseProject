@@ -77,39 +77,39 @@ INSERT INTO CovidSupplies(quantity,csid,bid) VALUES
 INSERT INTO CovidSupplies(quantity,csid,bid) VALUES
     (350,240,0005);
 
-INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
-     (0001,0001,'bob@uncle.com', 20.25);
+INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES
+     (0001,0001,'bob@uncle.com', 20.25, TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 20:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 
-INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
-     (0002, 0002, 'bob@uncle.com', 010.94);
+INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES
+     (0002, 0002, 'bob@uncle.com', 010.94, TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 17:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 
-INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
-     (0003, 0003, 'student@ubc.ca', 011.93);
+INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES
+     (0003, 0003, 'student@ubc.ca', 011.93, TO_TIMESTAMP('2020-09-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-23 23:15', 'YYYY-MM-DD HH24:MI:SS'));
 
 
-INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
-     (0004, 0002, 'dark@headprotection.com', 000.01);
+INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES
+     (0004, 0002, 'dark@headprotection.com', 000.01, TO_TIMESTAMP('2020-07-12 08:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-07-12 16:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 
-INSERT INTO ScheduledShift(shiftID, bid, email, Wage) VALUES
-     (0005, 0003, 'student@ubc.ca', 011.93);
+INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES
+     (0005, 0003, 'student@ubc.ca', 011.93, TO_TIMESTAMP('2020-06-12 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-13 01:45:00', 'YYYY-MM-DD HH24:MI:SS'));
 
-INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0001, TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 20:00:00', 'YYYY-MM-DD HH24:MI:SS'),08.00);
+INSERT INTO ScheduledTime(startTime, endTime, duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 20:00:00', 'YYYY-MM-DD HH24:MI:SS'),08.00);
 
-INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0002, TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 17:00:00', 'YYYY-MM-DD HH24:MI:SS'), 05.50);
+INSERT INTO ScheduledTime(startTime, endTime, duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-12 17:00:00', 'YYYY-MM-DD HH24:MI:SS'), 05.50);
 
-INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0003, TO_TIMESTAMP('2020-09-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-23 23:15', 'YYYY-MM-DD HH24:MI:SS'), 11.25);
+INSERT INTO ScheduledTime(startTime, endTime, duration) VALUES
+    (TO_TIMESTAMP('2020-09-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-23 23:15', 'YYYY-MM-DD HH24:MI:SS'), 11.25);
 
-INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0004, TO_TIMESTAMP('2020-07-12 08:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-07-12 16:00:00', 'YYYY-MM-DD HH24:MI:SS'), 08.00);
+INSERT INTO ScheduledTime(startTime, endTime, duration) VALUES
+    (TO_TIMESTAMP('2020-07-12 08:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-07-12 16:00:00', 'YYYY-MM-DD HH24:MI:SS'), 08.00);
 
-INSERT INTO ScheduledTime(shiftID, startTime, endTime, duration) VALUES
-    (0005, TO_TIMESTAMP('2020-06-12 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-13 01:45:00', 'YYYY-MM-DD HH24:MI:SS'),12.75);
+INSERT INTO ScheduledTime(startTime, endTime, duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2020-06-13 01:45:00', 'YYYY-MM-DD HH24:MI:SS'),12.75);
 
 INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES
     (0001, 0001, 00200.00, TO_TIMESTAMP('2020-07-06 08:00:00', 'YYYY-MM-DD HH24:MI:SS'));
