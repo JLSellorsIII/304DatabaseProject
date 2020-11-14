@@ -127,9 +127,7 @@ ON DELETE CASCADE
 CREATE TABLE ScheduledTime
 (startTime TIMESTAMP,
  endTime TIMESTAMP,
- duration DECIMAL(4,2),
-PRIMARY KEY (startTime, endTime)
-/* ON UPDATE CASCADE */);
+ duration DECIMAL(4,2));
 
 CREATE TABLE RecordedTransaction
 (tid INTEGER,
@@ -144,7 +142,7 @@ CREATE TABLE TracksDate
 (bid		INTEGER,
 email		VARCHAR(30),
 law		VARCHAR(50),
-violationDate	TIMESTAMP,
+violationDate	DATE,
 PRIMARY KEY (bid, email, law),
 FOREIGN KEY (bid) REFERENCES Business (bid)
 	/* ON UPDATE CASCADE */,
