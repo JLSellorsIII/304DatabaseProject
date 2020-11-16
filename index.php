@@ -121,8 +121,9 @@
                         </select>
 					</div>
 					<div>
-						<p>Email: </p>
-						<input type="text" name="email">
+                        <p>Email: </p>
+                        <select id="accountSelect" name="account">
+                        </select>
 					</div>
 					<div>
 						<p>Wage: </p>
