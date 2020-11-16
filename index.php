@@ -716,6 +716,19 @@ function handleAddPerishableConsumable() {
 		handleGETRequest();
 	}
 
+	function fillAccountSelect() {
+	    if(connectDB()) {
+	        $result = executeSQL("SELECT * FROM Account", null);
+	        $optionString = "";
+	        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+	            $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
+                    $row["EMAIL"] . "</option>";
+            }
+            callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
+        }
+	    disconnectDB();
+    }
+
 	function fillCustomerSelect() {
 		if(connectDB()) {
 			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
@@ -744,5 +757,7 @@ function handleAddPerishableConsumable() {
 
 	fillCustomerSelect();
 	fillBusinessSelect();
+	fillAccountSelect();
+
 ?>
 </html>
