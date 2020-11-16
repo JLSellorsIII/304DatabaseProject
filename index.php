@@ -116,8 +116,9 @@
 						<input type="text" name="shiftID">
 					</div>
 					<div>
-						<p>Business ID: </p>
-						<input type="text" name="bid">
+                        <p>Business: </p>
+                        <select id="businessSelect" name="business">
+                        </select>
 					</div>
 					<div>
 						<p>Email: </p>
@@ -180,8 +181,9 @@
                             <input type="text" name="tid">
                         </div>
                         <div>
-                            <p>BusinessID:</p>
-                            <input type="text" name="bid">
+                            <p>Business: </p>
+                            <select id="businessSelect" name="business">
+                            </select>
                         </div>
                         <div>
                             <p>amount:</p>
@@ -224,8 +226,9 @@
                             <input type="text" name="csid">
                         </div>
                         <div>
-                            <p>Business ID:</p>
-                            <input type="text" name="bid">
+                            <p>Business: </p>
+                            <select id="businessSelect" name="business">
+                            </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addCovidSupplies">
                     </form>
@@ -244,8 +247,9 @@
                             <input type="text" name="cid">
                         </div>
                         <div>
-                            <p>Business ID:</p>
-                            <input type="text" name="bid">
+                            <p>Business: </p>
+                            <select id="businessSelect" name="business">
+                            </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
                     </form>
@@ -260,8 +264,9 @@
                         <input type="text" name="cid">
                     </div>
                     <div>
-                        <p>Business ID:</p>
-                        <input type="text" name="bid">
+                        <p>Business: </p>
+                        <select id="businessSelect" name="business">
+                        </select>
                     </div>
                     <input class="submit button" type="submit" value="Add" name="addNonPerishableConsumable">
                 </form>
