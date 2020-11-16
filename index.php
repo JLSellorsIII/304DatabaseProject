@@ -289,17 +289,17 @@
 							<option value="fine">Fine</option>
 							<option value="visitedLength">VisitedLength</option>
 							<option value="visitedTime">VisitedTime</option>
-              <option value="business">Business</option>
-              <option value="transaction">Transaction</option>
-              <option value="covidSupplies">CovidSupplies</option>
-              <option value="nonPerishableConsumables">NonPerishableConsumables</option>
-              <option value="perishableConsumables">PerishableConsumables</option>
+                            <option value="business">Business</option>
+                            <option value="transaction">Transaction</option>
+                            <option value="covidSupplies">CovidSupplies</option>
+                            <option value="nonPerishableConsumables">NonPerishableConsumables</option>
+                            <option value="perishableConsumables">PerishableConsumables</option>
 							<option value="Account">Account</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable"></p>
 				</form>
-				<div id="displayTableSuccess"/>
-				<div id="mainTable"/>
+				<div id="displayTableSuccess"></div>
+				<div id="mainTable"></div>
 			</div>
 		</div>
 	</body>
@@ -621,10 +621,9 @@ function handleAddPerishableConsumable() {
 				$altHeaders = ["Start Time", "Phone Number", "Business ID", "Duration"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
-
-      case "business":
-        $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
-        $headers = ["url", "name", "capacity", "bid", "address"];
+            case "business":
+                $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
+                $headers = ["url", "name", "capacity", "bid", "address"];
                 $altHeaders = ["url", "Business", "Capacity", "Business ID", "Address"];
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
