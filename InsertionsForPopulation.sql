@@ -155,10 +155,10 @@ INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
     ('2020-06-12 11:00:00', 30, '2020-06-12 11:30:00');
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    ('2020-06-12 11:30:00', 90, '2020-06-12 13:00:00');
+    ('12-jun-2020:11:30:00', 90, '12-jun-2020:13:00:00');
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    ('2020-06-12 12:00:00', 30, '2020-06-12 12:30:00');
+    ('12-jun-2020:12:00:00', 30, '12-jun-2020:12:30:00');
 
 INSERT INTO Violation(law, description) VALUES
     ('Overcapacity', 'The business has had more people in the store at one time than they are permitted to');

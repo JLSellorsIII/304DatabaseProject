@@ -635,7 +635,7 @@ function handleAddPerishableConsumable() {
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
             case "covidSupplies":
-                $result = exectuteSQL("SELECT * FROM CovidSupplies", "displayTableSuccess");
+                $result = executeSQL("SELECT * FROM CovidSupplies", "displayTableSuccess");
                 $headers = ["quantity", "csid", "bid"];
                 $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
@@ -688,11 +688,9 @@ function handleAddPerishableConsumable() {
                 handleAddNonPerishableConsumable();
             } else if (array_key_exists("addPerishableConsumable", $_POST)) {
                 handleAddPerishableConsumable();
-           
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
 			}
-
             disconnectDB();
         }
     }

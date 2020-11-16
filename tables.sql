@@ -121,13 +121,10 @@ ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
 
 CREATE TABLE ScheduledTime
-(shiftID INTEGER,
+(
  startTime TIMESTAMP,
  endTime TIMESTAMP,
- duration DECIMAL(4,2),
-PRIMARY KEY (shiftID),
-FOREIGN KEY (shiftID) REFERENCES ScheduledShift (shiftID)
-ON DELETE CASCADE
+ duration DECIMAL(4,2)
 /* ON UPDATE CASCADE */);
 
 CREATE TABLE RecordedTransaction
