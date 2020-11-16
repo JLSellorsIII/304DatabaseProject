@@ -113,22 +113,21 @@ CREATE TABLE ScheduledShift
  bid          INTEGER NOT NULL,
  email      VARCHAR(30) NOT NULL,
  Wage	     DECIMAL(5,2),
+ startTime TIMESTAMP,
+ endTime TIMESTAMP,
 PRIMARY KEY (shiftID),
 FOREIGN KEY (bid) REFERENCES Business (bid),
 /* ON UPDATE CASCADE */
+FOREIGN KEY (startTime, endTime) REFERENCES ScheduledTime (startTime, endTime)
+ON DELETE CASCADE
 FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
 
 CREATE TABLE ScheduledTime
-(shiftID INTEGER,
- startTime TIMESTAMP,
+(startTime TIMESTAMP,
  endTime TIMESTAMP,
- duration DECIMAL(4,2),
-PRIMARY KEY (shiftID),
-FOREIGN KEY (shiftID) REFERENCES ScheduledShift (shiftID)
-ON DELETE CASCADE
-/* ON UPDATE CASCADE */);
+ duration DECIMAL(4,2));
 
 CREATE TABLE RecordedTransaction
 (tid INTEGER,
@@ -143,7 +142,7 @@ CREATE TABLE TracksDate
 (bid		INTEGER,
 email		VARCHAR(30),
 law		VARCHAR(50),
-violationDate	TIMESTAMP,
+violationDate	DATE,
 PRIMARY KEY (bid, email, law),
 FOREIGN KEY (bid) REFERENCES Business (bid)
 	/* ON UPDATE CASCADE */,
