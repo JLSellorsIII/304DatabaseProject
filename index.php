@@ -131,15 +131,11 @@
 					</div>
                     <div>
                         <p>StartTime: </p>
-                        <input type="text" name="startTime">
+                        <input type="datetime-local" name="startTime">
                     </div>
                     <div>
                         <p>EndTime: </p>
-                        <input type="text" name="endTime">
-                    </div>
-                    <div>
-                        <p>Duration: </p>
-                        <input type="text" name="duration">
+                        <input type="datetime-local" name="endTime">
                     </div>
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
@@ -191,8 +187,8 @@
                             <input type="text" name="amount">
                         </div>
                         <div>
-                            <p>date(dd.mmm.yyyy:hh:mm:ss):</p>
-                            <input type="text" name="date">
+                            <p>date:</p>
+                            <input type="datetime-local" name="date">
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addTransaction">
                     </form>
@@ -302,11 +298,27 @@
                             <option value="perishableConsumables">PerishableConsumables</option>
 							<option value="Account">Account</option>
 						</select>
-					<input type="submit" class="button" value="Get" name="displayTable"></p>
+					<input type="submit" class="button" value="Get" name="displayTable">
 				</form>
 				<div id="displayTableSuccess"></div>
 				<div id="mainTable"></div>
 			</div>
+
+            <div class="op-container">
+                <h2>Get Covid Supplies with Quantity below X</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>X:</p>
+                        <input type="text" name="x">
+                    </div>
+                    <input class="submit button" type="submit" value="Get" name="getCovidSuppliesBelowX">
+                </form>
+                <div id="getCovidSuppliesBelowXSuccess"></div>
+                <div id="getCovidSuppliesTable"></div>
+            </div>
+
+
+
 		</div>
 	</body>
 
@@ -445,8 +457,12 @@
 	function handleAddShift() {
 		global $db_conn;
 
-		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage)
-		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "')",
+        $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime)
+		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
+		" . $startTime . "" . $endTime . "')",
 		"addShiftSuccess");
 		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
@@ -477,9 +493,10 @@
 
     function handleAddTransaction() {
 	    global $db_conn;
+        $transactionDate = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
 	    $result = executeSQL("INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('" .
-            $_POST['tid'] . "', '" . $_POST['bid'] . "', '" . $_POST['amount'] . "', '" . $_POST['date'] .  "')",
+            $_POST['tid'] . "', '" . $_POST['bid'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
             "addTransactionSuccess");
 
 	    OCICommit($db_conn);
@@ -667,6 +684,13 @@ function handleAddPerishableConsumable() {
 		}
 	}
 
+	function handleGetCovidSuppliesBelowX() {
+	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
+	    $headers = ["csid", "quantity", "bid"];
+	    $altHeaders = null;
+	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
+    }
+
 
 	function handlePOSTRequest()
     {
@@ -695,7 +719,9 @@ function handleAddPerishableConsumable() {
                 handleAddPerishableConsumable();
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
-			}
+			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
+                handleGetCovidSuppliesBelowX();
+            }
             disconnectDB();
         }
     }
@@ -706,7 +732,7 @@ function handleAddPerishableConsumable() {
 				initTables();
 			} else if (array_key_exists('populateTables', $_GET)) {
 			    populateTables();
-			}
+            }
 			disconnectDB();
 		}
 	}
