@@ -32,7 +32,7 @@
 		<div id="additions">
 			<h1>Additions</h1>
 			<div class="op-container">
-				<h2>Add Visiting Customer</h2>
+				<h2>Add Customer Contact</h2>
 				<form method="POST" action="index.php">
 					<div>
 						<p>Name:</p>
@@ -274,6 +274,30 @@
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
+			<div class="op-container">
+				<h2>Delete Fine</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Fine: </p>
+						<select id="fineSelect" name="fine">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteFine">
+				</form>
+				<div id="deleteFineSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Delete Warning</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Warning: </p>
+						<select id="warningSelect" name="warning">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteWarning">
+				</form>
+				<div id="deleteWarningSuccess"/>
+			</div>
 		</div>
 		<div id="queries">
 			<h1>Queries</h1>
@@ -553,6 +577,24 @@ function handleAddPerishableConsumable() {
 		OCICommit($db_conn);
 	}
 
+    function handleDeleteFine() {
+        global $db_conn;
+        executeSQL("DELETE FROM Fine WHERE law='" . $_POST['fine'] . "'",
+                "deleteFineSuccess");
+        executeSQL("DELETE FROM Violation WHERE law='" . $_POST['fine'] . "'",
+                "deleteFineSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleDeleteWarning() {
+        global $db_conn;
+        executeSQL("DELETE FROM Warning WHERE law='" . $_POST['warning'] . "'",
+                "deleteFineSuccess");
+        executeSQL("DELETE FROM Violation WHERE law='" . $_POST['warning'] . "'",
+                "deleteFineSuccess");
+        OCICommit($db_conn);
+    }
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -687,9 +729,12 @@ function handleAddPerishableConsumable() {
                 handleAddNonPerishableConsumable();
             } else if (array_key_exists("addPerishableConsumable", $_POST)) {
                 handleAddPerishableConsumable();
-           
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
+			} else if (array_key_exists("deleteFine", $_POST)) {
+				handleDeleteFine();
+			} else if (array_key_exists("deleteWarning", $_POST)) {
+				handleDeleteWarning();
 			}
 
             disconnectDB();
@@ -739,7 +784,41 @@ function handleAddPerishableConsumable() {
 		disconnectDB();
 	}
 
+    function fillFineSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Fine, Violation
+                WHERE Fine.law=Violation.law",null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["LAW"] . "'>" .
+					$row["LAW"] . " - amount: " . $row["AMOUNT"] . "</option>";
+			}
+			callJSFunc("printToElement('fineSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
+    function fillWarningSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Warning, Violation
+                WHERE Warning.law=Violation.law", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["LAW"] . "'>" .
+					$row["LAW"] . " - severity: " . $row["SEVERITY"] . "</option>";
+			}
+			callJSFunc("printToElement('warningSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
 	fillCustomerSelect();
 	fillBusinessSelect();
+    fillFineSelect();
+    fillWarningSelect();
 ?>
 </html>
