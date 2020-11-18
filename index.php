@@ -356,6 +356,22 @@
 				</form>
 				<div id="updateWarningLevelSuccess"></div>
             </div>
+            <div class="op-container">
+				<h2>Update Violation Description</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="violationSelect" name="violation">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Description: </p>
+                        <input type="text" name="desc" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateViolationDesc">
+				</form>
+				<div id="updateViolationDescSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -739,6 +755,14 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
+    function handleUpdateViolationDesc() {
+        global $db_conn;
+        executeSQL("UPDATE Violation
+                    SET description='" . $_POST['desc'] .
+                   "' WHERE law='" . $_POST['violation'] . "'", "updateViolationDescSuccess");
+        OCICommit($db_conn);
+    }
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -898,6 +922,8 @@ function handleAddPerishableConsumable() {
 				handleUpdateFineAmount();
 			} else if (array_key_exists("updateWarningLevel", $_POST)) {
 				handleUpdateWarningLevel();
+			} else if (array_key_exists("updateViolationDesc", $_POST)) {
+				handleUpdateViolationDesc();
 			}
 
             disconnectDB();
