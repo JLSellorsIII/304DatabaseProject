@@ -516,7 +516,6 @@
 
 	function handleAddWarning() {
 		global $db_conn;
-		// TODO: Check if law already exists before setting it
 		executeSQL("INSERT INTO Violation(law, description)
 					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
 					"addWarningSuccess");
@@ -578,7 +577,6 @@ function handleAddPerishableConsumable() {
 
 	function handleAddFine() {
 		global $db_conn;
-		// TODO: Check if law already exists before setting it
 		executeSQL("INSERT INTO Violation(law, description)
 					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
 					"addFineSuccess");
@@ -589,24 +587,30 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleAddVisitor() {
-		//TODO: debug "not a valid month", waiting for addBusiness
 		global $db_conn;
 		$endTime = $_POST['startTime'] + $_POST['duration'];
-		$startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-		$endTime = date("Y-m-d H:i:s",
+		$startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
+		$endTime = date("d.m.Y:H:i:s",
 						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
+        $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
+                                FROM VisitedLength
+                                WHERE VisitedLength.arrivalTime='" . $startTime . "'
+                                AND VisitedLength.duration='" . $$_POST["duration"]
+                                . "'", null), OCI_NUM);
+        if(count($timeArray) < 2) {
+            executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
+                        VALUES (TO_DATE('"
+                    . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), '"
+                    . $_POST['duration'] . "', TO_DATE('"
+                    . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'))",
+                        "addVisitorSuccess");
+        }
 		executeSQL("INSERT INTO VisitedTime(arrivalTime, pNumber, bid, duration)
-					VALUES ('"
-				   . $startTime . "', '"
+					VALUES (TO_DATE('"
+				   . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), '"
 				   . $_POST['customer'] . "', '"
 				   . $_POST['business'] . "', '"
 				   . $_POST['duration'] . "')",
-					"addVisitorSuccess");
-		executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
-					VALUES ('"
-				   . $startTime . "', '"
-				   . $_POST['duration'] . "', '"
-				   . $endTime . "')",
 					"addVisitorSuccess");
 		OCICommit($db_conn);
 	}
