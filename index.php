@@ -305,6 +305,25 @@
 		</div>
 		<div id="updates">
 			<h1>Updates</h1>
+			<div class="op-container">
+				<h2>Update Paid Tracked Fine</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="trackedFineSelect" name="fine">
+                        </select>
+					</div>
+                    <div>
+                        <p>Paid? </p>
+						<select id="paid" name="paid">
+                            <option value=1>Yes</option>
+                            <option value=0>No</option>
+                        </select>
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updatePaid">
+				</form>
+				<div id="updatePaidSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -658,6 +677,20 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
+    function handleUpdatePaid() {
+        global $db_conn;
+        $tracksInfo = preg_split("/_/", $_POST['fine']);
+        $bid = $tracksInfo[0];
+        $email = $tracksInfo[1];
+        $law = $tracksInfo[2];
+        executeSQL("UPDATE TracksPaid
+                    SET paid=" . $_POST['paid'] . "
+                    WHERE bid='" . $bid . "' AND "
+                    . "email='" . $email . "' AND "
+                    . "law='" . $law . "'", "updatePaidSuccess");
+        OCICommit($db_conn);
+    }
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -812,6 +845,8 @@ function handleAddPerishableConsumable() {
 				handleDeleteFine();
 			} else if (array_key_exists("deleteWarning", $_POST)) {
 				handleDeleteWarning();
+			} else if (array_key_exists("updatePaid", $_POST)) {
+				handleUpdatePaid();
 			}
 
             disconnectDB();
@@ -923,11 +958,34 @@ function handleAddPerishableConsumable() {
         disconnectDB();
     }
 
+    function fillTrackedFineSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM TracksPaid, Fine
+                WHERE TracksPaid.law=Fine.law", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='"
+                                  . $row["BID"]
+                                  . "_" . $row["EMAIL"]
+                                  . "_" . $row["LAW"] . "'> BID: "
+                                  . $row["BID"]
+                                  . " - " . $row["LAW"]
+                                  . " - "
+                                  . $row["EMAIL"] . "</option>";
+			}
+			callJSFunc("printToElements('trackedFineSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
 	fillCustomerSelect();
 	fillBusinessSelect();
     fillFineSelect();
     fillWarningSelect();
     fillViolationSelect();
     fillAccountSelect();
+    fillTrackedFineSelect();
 ?>
 </html>
