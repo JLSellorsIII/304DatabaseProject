@@ -732,8 +732,6 @@ function handleAddPerishableConsumable() {
     }
 
     function handleUpdateWarningLevel() {
-        echo $_POST['severity'];
-        echo $_POST['warning'];
         global $db_conn;
         executeSQL("UPDATE Warning
                     SET severity=" . $_POST['severity'] .
