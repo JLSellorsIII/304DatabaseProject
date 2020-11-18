@@ -324,6 +324,22 @@
 				</form>
 				<div id="updatePaidSuccess"></div>
             </div>
+            <div class="op-container">
+				<h2>Update Fine Amount</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="fineSelect" name="fine">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Amount: </p>
+                        <input type="text" name="amount" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateFineAmount">
+				</form>
+				<div id="updateFineAmountSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -691,6 +707,14 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
+    function handleUpdateFineAmount() {
+        global $db_conn;
+        executeSQL("UPDATE Fine
+                    SET amount=" . $_POST['amount'] .
+                   " WHERE law='" . $_POST['fine'] . "'", "updateFineAmountSuccess");
+        OCICommit($db_conn);
+    }
+
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
 		if($altHeaders != null) {
@@ -714,7 +738,6 @@ function handleAddPerishableConsumable() {
 		$tableString .= "</table>";
 		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
 	}
-
 	function handleDisplayTable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
@@ -847,6 +870,8 @@ function handleAddPerishableConsumable() {
 				handleDeleteWarning();
 			} else if (array_key_exists("updatePaid", $_POST)) {
 				handleUpdatePaid();
+			} else if (array_key_exists("updateFineAmount", $_POST)) {
+				handleUpdateFineAmount();
 			}
 
             disconnectDB();
