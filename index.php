@@ -458,13 +458,17 @@
 		global $db_conn;
 
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime)
-		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
-		" . $startTime . "" . $endTime . "')",
+		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "', '
+		" . $startTime . "', '" . $endTime . "')",
 		"addShiftSuccess");
-		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
+
+		$duration = executeSQL("SELECT '" . $endTime . "-" . $startTime ." datediff FROM dual'") * 24;
+
+		$result = executeSQL("INSERT INTO ScheduledTime(startTime,endTime,duration) VALUES 
+    ('" . $startTime . "', '" . $endTime . "')","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -685,7 +689,8 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
-	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
+	    $test = executeSQL("SELECT * FROM CovidSupplies");
+	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'", "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
@@ -719,7 +724,7 @@ function handleAddPerishableConsumable() {
                 handleAddPerishableConsumable();
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
-			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
+			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
             }
             disconnectDB();

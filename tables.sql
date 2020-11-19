@@ -119,7 +119,7 @@ PRIMARY KEY (shiftID),
 FOREIGN KEY (bid) REFERENCES Business (bid),
 /* ON UPDATE CASCADE */
 FOREIGN KEY (startTime, endTime) REFERENCES ScheduledTime (startTime, endTime)
-ON DELETE CASCADE
+ON DELETE CASCADE,
 FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
