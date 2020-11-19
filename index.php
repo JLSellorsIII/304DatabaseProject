@@ -115,16 +115,16 @@
 						<p>Shift ID: </p>
 						<input type="text" name="shiftID">
 					</div>
-					<div>
+                    <div>
                         <p>Business: </p>
-                        <select id="businessSelect" name="business">
+                        <select class="businessSelect" name="business">
                         </select>
-					</div>
-					<div>
-                        <p>Email: </p>
-                        <select id="accountSelect" name="account">
+                    </div>
+                    <div>
+                        <p>Account: </p>
+                        <select class="accountSelect" name="account">
                         </select>
-					</div>
+                    </div>
 					<div>
 						<p>Wage: </p>
 						<input type="text" name="Wage">
@@ -213,7 +213,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <div>
@@ -258,7 +258,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addCovidSupplies">
@@ -279,7 +279,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
@@ -296,7 +296,7 @@
                     </div>
                     <div>
                         <p>Business: </p>
-                        <select id="businessSelect" name="business">
+                        <select class="businessSelect" name="business">
                         </select>
                     </div>
                     <input class="submit button" type="submit" value="Add" name="addNonPerishableConsumable">
@@ -978,19 +978,6 @@ function handleAddPerishableConsumable() {
 		handleGETRequest();
 	}
 
-	function fillAccountSelect() {
-	    if(connectDB()) {
-	        $result = executeSQL("SELECT * FROM Account", null);
-	        $optionString = "";
-	        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-	            $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
-                    $row["EMAIL"] . "</option>";
-            }
-            callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
-        }
-	    disconnectDB();
-    }
-
 	function fillCustomerSelect() {
 		if(connectDB()) {
 			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
@@ -1108,6 +1095,5 @@ function handleAddPerishableConsumable() {
     fillViolationSelect();
     fillAccountSelect();
     fillTrackedFineSelect();
-	fillAccountSelect();
 ?>
 </html>
