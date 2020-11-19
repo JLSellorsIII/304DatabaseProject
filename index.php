@@ -32,7 +32,7 @@
 		<div id="additions">
 			<h1>Additions</h1>
 			<div class="op-container">
-				<h2>Add Visiting Customer</h2>
+				<h2>Add Customer Contact</h2>
 				<form method="POST" action="index.php">
 					<div>
 						<p>Name:</p>
@@ -59,11 +59,11 @@
 					</div>
 					<div>
 						<p>Customer: </p>
-						<select id="customerSelect" name="customer"> </select>
+						<select class="customerSelect" name="customer"> </select>
 					</div>
 					<div>
 						<p>Business: </p>
-						<select id="businessSelect" name="business">
+						<select class="businessSelect" name="business">
 						</select>
 					</div>
 					<input class="submit button" type="submit" value="Add" name="addVisitor">
@@ -140,6 +140,40 @@
 					<input type="submit" class="submit button" value="Add" name="addShift">
 				</form>
 				<div id="addShiftSuccess"/>
+            </div>
+			<div class="op-container">
+				<h2>Add Tracked Violation</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Business: </p>
+						<select class="businessSelect" name="business">
+                        </select>
+					</div>
+					<div>
+						<p>Account: </p>
+						<select class="accountSelect" name="account">
+                        </select>
+					</div>
+					<div>
+						<p>Violation: </p>
+						<select class="violationSelect" name="violation">
+                        </select>
+					</div>
+					<div>
+						<p>Time: </p>
+						<input type="datetime-local" name="time">
+					</div>
+                    <div>
+                        <p>Paid? </p>
+						<select id="paid" name="paid">
+                            <option value=null>N/A</option>
+                            <option value=1>Yes</option>
+                            <option value=0>No</option>
+                        </select>
+                    </div>
+					<input type="submit" class="submit button" value="Add" name="addTracks">
+				</form>
+				<div id="addTracksSuccess"></div>
             </div>
 
                 <div class="op-container">
@@ -273,9 +307,100 @@
 		</div>
 		<div id="updates">
 			<h1>Updates</h1>
+			<div class="op-container">
+				<h2>Update Paid Tracked Fine</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="trackedFineSelect" name="fine">
+                        </select>
+					</div>
+                    <div>
+                        <p>Paid? </p>
+						<select id="paid" name="paid">
+                            <option value=1>Yes</option>
+                            <option value=0>No</option>
+                        </select>
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updatePaid">
+				</form>
+				<div id="updatePaidSuccess"></div>
+            </div>
+            <div class="op-container">
+				<h2>Update Fine Amount</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="fineSelect" name="fine">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Amount: </p>
+                        <input type="text" name="amount" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateFineAmount">
+				</form>
+				<div id="updateFineAmountSuccess"></div>
+            </div>
+            <div class="op-container">
+				<h2>Update Warning Level</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="warningSelect" name="warning">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Level: </p>
+                        <input type="text" name="severity" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateWarningLevel">
+				</form>
+				<div id="updateWarningLevelSuccess"></div>
+            </div>
+            <div class="op-container">
+				<h2>Update Violation Description</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Violation: </p>
+						<select class="violationSelect" name="violation">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Description: </p>
+                        <input type="text" name="desc" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateViolationDesc">
+				</form>
+				<div id="updateViolationDescSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
+			<div class="op-container">
+				<h2>Delete Fine</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Fine: </p>
+						<select class="fineSelect" name="fine">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteFine">
+				</form>
+				<div id="deleteFineSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Delete Warning</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Warning: </p>
+						<select class="warningSelect" name="warning">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteWarning">
+				</form>
+				<div id="deleteWarningSuccess"/>
+			</div>
 		</div>
 		<div id="queries">
 			<h1>Queries</h1>
@@ -297,6 +422,8 @@
                             <option value="nonPerishableConsumables">NonPerishableConsumables</option>
                             <option value="perishableConsumables">PerishableConsumables</option>
 							<option value="Account">Account</option>
+							<option value="tracksDate">TracksDate</option>
+							<option value="tracksPaid">TracksPaid</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable">
 				</form>
@@ -338,6 +465,13 @@
 			id.innerHTML = '';
 			}
 		}
+
+        function printToElements(classname, text) {
+            var elements = document.getElementsByClassName(classname);
+            for(var i = 0; i < elements.length; i++) {
+                elements[i].innerHTML += text;
+            }
+        }
 	 </script>
 <?php
 	$success = True;
@@ -458,24 +592,19 @@
 		global $db_conn;
 
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
+        $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime)
-		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "', '
-		" . $startTime . "', '" . $endTime . "')",
+		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
+		" . $startTime . "" . $endTime . "')",
 		"addShiftSuccess");
-
-		$duration = executeSQL("SELECT '" . $endTime . "-" . $startTime ." datediff FROM dual'") * 24;
-
-		$result = executeSQL("INSERT INTO ScheduledTime(startTime,endTime,duration) VALUES 
-    ('" . $startTime . "', '" . $endTime . "')","addShiftSuccess");
+		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
 
 	function handleAddWarning() {
 		global $db_conn;
-		// TODO: Check if law already exists before setting it
 		executeSQL("INSERT INTO Violation(law, description)
 					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
 					"addWarningSuccess");
@@ -538,7 +667,6 @@ function handleAddPerishableConsumable() {
 
 	function handleAddFine() {
 		global $db_conn;
-		// TODO: Check if law already exists before setting it
 		executeSQL("INSERT INTO Violation(law, description)
 					VALUES ('". $_POST['law'] . "', '" . $_POST['desc'] . "')",
 					"addFineSuccess");
@@ -549,24 +677,30 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleAddVisitor() {
-		//TODO: debug "not a valid month", waiting for addBusiness
 		global $db_conn;
 		$endTime = $_POST['startTime'] + $_POST['duration'];
-		$startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-		$endTime = date("Y-m-d H:i:s",
+		$startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
+		$endTime = date("d.m.Y:H:i:s",
 						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
+        $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
+                                FROM VisitedLength
+                                WHERE VisitedLength.arrivalTime='" . $startTime . "'
+                                AND VisitedLength.duration='" . $$_POST["duration"]
+                                . "'", null), OCI_NUM);
+        if(count($timeArray) < 2) {
+            executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
+                        VALUES (TO_DATE('"
+                    . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), '"
+                    . $_POST['duration'] . "', TO_DATE('"
+                    . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'))",
+                        "addVisitorSuccess");
+        }
 		executeSQL("INSERT INTO VisitedTime(arrivalTime, pNumber, bid, duration)
-					VALUES ('"
-				   . $startTime . "', '"
+					VALUES (TO_DATE('"
+				   . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), '"
 				   . $_POST['customer'] . "', '"
 				   . $_POST['business'] . "', '"
 				   . $_POST['duration'] . "')",
-					"addVisitorSuccess");
-		executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
-					VALUES ('"
-				   . $startTime . "', '"
-				   . $_POST['duration'] . "', '"
-				   . $endTime . "')",
 					"addVisitorSuccess");
 		OCICommit($db_conn);
 	}
@@ -579,6 +713,78 @@ function handleAddPerishableConsumable() {
 					"addAccountSuccess");
 		OCICommit($db_conn);
 	}
+
+    function handleAddTracks() {
+        global $db_conn;
+		$time = date("Y-m-d H:i:s", strtotime($_POST['time']));
+        executeSQL("INSERT INTO TracksDate(bid, email, law, violationDate)
+                    VALUES (" . $_POST['business'] . ", "
+                   . "'" . $_POST['account'] . "', "
+                   . "'" . $_POST['violation'] . "', "
+                   . "'" . $$time . "')", "addTracksSuccess");
+        executeSQL("INSERT INTO TracksPaid(bid, email, law, paid)
+                    VALUES (" . $_POST['business'] . ", "
+                   . "'" . $_POST['account'] . "', "
+                   . "'" . $_POST['violation'] . "', "
+                   . $_POST['paid'] . ")", "addTracksSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleDeleteFine() {
+        global $db_conn;
+        executeSQL("DELETE FROM Fine WHERE law='" . $_POST['fine'] . "'",
+                "deleteFineSuccess");
+        executeSQL("DELETE FROM Violation WHERE law='" . $_POST['fine'] . "'",
+                "deleteFineSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleDeleteWarning() {
+        global $db_conn;
+        executeSQL("DELETE FROM Warning WHERE law='" . $_POST['warning'] . "'",
+                "deleteFineSuccess");
+        executeSQL("DELETE FROM Violation WHERE law='" . $_POST['warning'] . "'",
+                "deleteFineSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleUpdatePaid() {
+        global $db_conn;
+        $tracksInfo = preg_split("/_/", $_POST['fine']);
+        $bid = $tracksInfo[0];
+        $email = $tracksInfo[1];
+        $law = $tracksInfo[2];
+        executeSQL("UPDATE TracksPaid
+                    SET paid=" . $_POST['paid'] . "
+                    WHERE bid='" . $bid . "' AND "
+                    . "email='" . $email . "' AND "
+                    . "law='" . $law . "'", "updatePaidSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleUpdateFineAmount() {
+        global $db_conn;
+        executeSQL("UPDATE Fine
+                    SET amount=" . $_POST['amount'] .
+                   " WHERE law='" . $_POST['fine'] . "'", "updateFineAmountSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleUpdateWarningLevel() {
+        global $db_conn;
+        executeSQL("UPDATE Warning
+                    SET severity=" . $_POST['severity'] .
+                   " WHERE law='" . $_POST['warning'] . "'", "updateWarningLevelSuccess");
+        OCICommit($db_conn);
+    }
+
+    function handleUpdateViolationDesc() {
+        global $db_conn;
+        executeSQL("UPDATE Violation
+                    SET description='" . $_POST['desc'] .
+                   "' WHERE law='" . $_POST['violation'] . "'", "updateViolationDescSuccess");
+        OCICommit($db_conn);
+    }
 
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
@@ -603,7 +809,6 @@ function handleAddPerishableConsumable() {
 		$tableString .= "</table>";
 		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
 	}
-
 	function handleDisplayTable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
@@ -685,12 +890,23 @@ function handleAddPerishableConsumable() {
 				$altHeaders = ["Email Address", "Password"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
+            case "tracksDate":
+                $result = executeSQL("SELECT * FROM TracksDate", "displayTableSuccess");
+                $headers = ["bid", "email", "law", "violationDate"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
+            case "tracksPaid":
+                $result = executeSQL("SELECT * FROM TracksPaid", "displayTableSuccess");
+                $headers = ["bid", "email", "law", "paid"];
+                $altHeaders = null;
+                printTable($result, $headers, $altHeaders, "mainTable");
+                break;
 		}
 	}
 
 	function handleGetCovidSuppliesBelowX() {
-	    $test = executeSQL("SELECT * FROM CovidSupplies");
-	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'", "getCovidSuppliesBelowXSuccess");
+	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
@@ -724,7 +940,21 @@ function handleAddPerishableConsumable() {
                 handleAddPerishableConsumable();
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
-			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
+			} else if (array_key_exists("addTracks", $_POST)) {
+				handleAddTracks();
+			} else if (array_key_exists("deleteFine", $_POST)) {
+				handleDeleteFine();
+			} else if (array_key_exists("deleteWarning", $_POST)) {
+				handleDeleteWarning();
+			} else if (array_key_exists("updatePaid", $_POST)) {
+				handleUpdatePaid();
+			} else if (array_key_exists("updateFineAmount", $_POST)) {
+				handleUpdateFineAmount();
+			} else if (array_key_exists("updateWarningLevel", $_POST)) {
+				handleUpdateWarningLevel();
+			} else if (array_key_exists("updateViolationDesc", $_POST)) {
+				handleUpdateViolationDesc();
+			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
                 handleGetCovidSuppliesBelowX();
             }
             disconnectDB();
@@ -769,7 +999,7 @@ function handleAddPerishableConsumable() {
 				$optionString .= "<option value='" . $row["PNUMBER"] . "'>" .
 								$row["NAME"] . " - " . $row["PNUMBER"] . "</option>";
 			}
-			callJSFunc("printToElement('customerSelect', `" . $optionString . "`)");
+			callJSFunc("printToElements('customerSelect', `" . $optionString . "`)");
 		}
 		disconnectDB();
 	}
@@ -782,14 +1012,102 @@ function handleAddPerishableConsumable() {
 				$optionString .= "<option value='" . $row["BID"] . "'>" .
 					$row["NAME"] . " - " . $row["ADDRESS"] . "</option>";
 			}
-			callJSFunc("printToElement('businessSelect', `" . $optionString . "`)");
+			callJSFunc("printToElements('businessSelect', `" . $optionString . "`)");
 		}
 		disconnectDB();
 	}
 
+    function fillFineSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Fine, Violation
+                WHERE Fine.law=Violation.law",null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["LAW"] . "'>" .
+					$row["LAW"] . " - amount: " . $row["AMOUNT"] . "</option>";
+			}
+			callJSFunc("printToElements('fineSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
+    function fillWarningSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Warning, Violation
+                WHERE Warning.law=Violation.law", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["LAW"] . "'>" .
+					$row["LAW"] . " - severity: " . $row["SEVERITY"] . "</option>";
+			}
+			callJSFunc("printToElements('warningSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
+    function fillViolationSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Violation", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["LAW"] . "'>" .
+					$row["LAW"] . " - " . $row["DESCRIPTION"] . "</option>";
+			}
+			callJSFunc("printToElements('violationSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
+    function fillAccountSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM Account", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='" . $row["EMAIL"] . "'>" .
+					$row["EMAIL"] . "</option>";
+			}
+			callJSFunc("printToElements('accountSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
+    function fillTrackedFineSelect() {
+        if(connectDB()) {
+            $result = executeSQL(
+                "SELECT *
+                FROM TracksPaid, Fine
+                WHERE TracksPaid.law=Fine.law", null);
+            $optionString = "";
+			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+				$optionString .= "<option value='"
+                                  . $row["BID"]
+                                  . "_" . $row["EMAIL"]
+                                  . "_" . $row["LAW"] . "'> BID: "
+                                  . $row["BID"]
+                                  . " - " . $row["LAW"]
+                                  . " - "
+                                  . $row["EMAIL"] . "</option>";
+			}
+			callJSFunc("printToElements('trackedFineSelect', `" . $optionString . "`)");
+        }
+        disconnectDB();
+    }
+
 	fillCustomerSelect();
 	fillBusinessSelect();
+    fillFineSelect();
+    fillWarningSelect();
+    fillViolationSelect();
+    fillAccountSelect();
+    fillTrackedFineSelect();
 	fillAccountSelect();
-
 ?>
 </html>

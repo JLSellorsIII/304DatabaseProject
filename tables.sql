@@ -8,8 +8,8 @@ DROP TABLE Warning;
 DROP TABLE Fine;
 DROP TABLE Violation;
 DROP TABLE CustomerPartyContact;
-DROP TABLE ScheduledTime;
 DROP TABLE ScheduledShift;
+DROP TABLE ScheduledTime;
 DROP TABLE Accesses;
 DROP TABLE Account;
 DROP TABLE CovidSupplies;
@@ -36,13 +36,13 @@ CREATE TABLE Account
  PRIMARY KEY (email));
  
  CREATE TABLE VisitedLength
-(arrivalTime		TIMESTAMP,
+(arrivalTime		DATE,
 Duration	INTEGER,
-endTime	TIMESTAMP,
+endTime	DATE,
 PRIMARY KEY (arrivalTime, Duration));
 
 CREATE TABLE VisitedTime
-(arrivalTime		TIMESTAMP,
+(arrivalTime		DATE,
 pNumber	VARCHAR(13),
 bid		INTEGER,
 Duration	INTEGER,
@@ -108,13 +108,19 @@ CREATE TABLE CovidSupplies
  FOREIGN KEY (bid) REFERENCES Business (bid)
 /* ON UPDATE CASCADE */);
 
+CREATE TABLE ScheduledTime
+(startTime TIMESTAMP,
+ endTime TIMESTAMP,
+ duration DECIMAL(4,2),
+ PRIMARY KEY (startTime, endTime));
+
 CREATE TABLE ScheduledShift
 (shiftID    INTEGER,
  bid          INTEGER NOT NULL,
  email      VARCHAR(30) NOT NULL,
  Wage	     DECIMAL(5,2),
- startTime TIMESTAMP,
- endTime TIMESTAMP,
+ startTime DATE,
+ endTime DATE,
 PRIMARY KEY (shiftID),
 FOREIGN KEY (bid) REFERENCES Business (bid),
 /* ON UPDATE CASCADE */
@@ -124,16 +130,11 @@ FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
 
-CREATE TABLE ScheduledTime
-(startTime TIMESTAMP,
- endTime TIMESTAMP,
- duration DECIMAL(4,2));
-
 CREATE TABLE RecordedTransaction
 (tid INTEGER,
 bid INTEGER NOT NULL,
 amount DECIMAL(7,2),
-transactionDate TIMESTAMP,
+transactionDate DATE,
 PRIMARY KEY (tid),
 FOREIGN KEY (bid) REFERENCES Business (bid)
     /* ON UPDATE CASCADE */);
