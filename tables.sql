@@ -8,8 +8,8 @@ DROP TABLE Warning;
 DROP TABLE Fine;
 DROP TABLE Violation;
 DROP TABLE CustomerPartyContact;
-DROP TABLE ScheduledTime;
 DROP TABLE ScheduledShift;
+DROP TABLE ScheduledTime;
 DROP TABLE Accesses;
 DROP TABLE Account;
 DROP TABLE CovidSupplies;
@@ -108,6 +108,12 @@ CREATE TABLE CovidSupplies
  FOREIGN KEY (bid) REFERENCES Business (bid)
 /* ON UPDATE CASCADE */);
 
+CREATE TABLE ScheduledTime
+(startTime TIMESTAMP,
+ endTime TIMESTAMP,
+ duration DECIMAL(4,2),
+ PRIMARY KEY (startTime, endTime));
+
 CREATE TABLE ScheduledShift
 (shiftID    INTEGER,
  bid          INTEGER NOT NULL,
@@ -119,15 +125,10 @@ PRIMARY KEY (shiftID),
 FOREIGN KEY (bid) REFERENCES Business (bid),
 /* ON UPDATE CASCADE */
 FOREIGN KEY (startTime, endTime) REFERENCES ScheduledTime (startTime, endTime)
-ON DELETE CASCADE
+ON DELETE CASCADE,
 FOREIGN KEY (email) REFERENCES Account (email)
 ON DELETE CASCADE
 /* ON UPDATE CASCADE */);
-
-CREATE TABLE ScheduledTime
-(startTime TIMESTAMP,
- endTime TIMESTAMP,
- duration DECIMAL(4,2));
 
 CREATE TABLE RecordedTransaction
 (tid INTEGER,
