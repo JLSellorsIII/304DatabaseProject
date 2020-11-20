@@ -374,6 +374,22 @@
 				</form>
 				<div id="updateViolationDescSuccess"></div>
             </div>
+			<div class="op-container">
+				<h2>Update Business Address</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Business: </p>
+						<select class="businessSelect" name="business">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Address: </p>
+                        <input type="text" name="address" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateBusinessAddress">
+				</form>
+				<div id="updateBusinessAddressSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -785,6 +801,17 @@ function handleAddPerishableConsumable() {
                    "' WHERE law='" . $_POST['violation'] . "'", "updateViolationDescSuccess");
         OCICommit($db_conn);
     }
+	
+	function handleUpdateBusinessAddress() {
+        global $db_conn;
+        executeSQL("UPDATE Business
+                    SET address='" . $_POST['address'] . "'
+                    WHERE url='" . $_POST['url'] . "' AND "
+				   . "name='" . $_POST['name'] . "' AND "
+				   . "capacity='" . $_POST['capacity'] . "' AND "
+				   . "bid='" . $_POST['bid'] . "'", "updateBusinessAddressSuccess");
+        OCICommit($db_conn);
+    }
 
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
@@ -954,9 +981,12 @@ function handleAddPerishableConsumable() {
 				handleUpdateWarningLevel();
 			} else if (array_key_exists("updateViolationDesc", $_POST)) {
 				handleUpdateViolationDesc();
+			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
+				handleUpdateBusinessAddress();
 			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
                 handleGetCovidSuppliesBelowX();
-            }
+      }
+
             disconnectDB();
         }
     }
@@ -1062,7 +1092,7 @@ function handleAddPerishableConsumable() {
 			callJSFunc("printToElements('violationSelect', `" . $optionString . "`)");
         }
         disconnectDB();
-    }
+    }	
 
     function fillAccountSelect() {
         if(connectDB()) {
