@@ -472,6 +472,23 @@
                 <div id="getCovidSuppliesBelowXSuccess"></div>
                 <div id="getCovidSuppliesTable"></div>
             </div>
+            <div class="op-container">
+                <h2>Get Businesses With Capacity Between X And Y</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>X:</p>
+                        <input type="number" name="x">
+                    </div>
+                    <div>
+                        <p>Y:</p>
+                        <input type="number" name="y">
+                    </div>
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesWithCapacityBetweenXAndY">
+                </form>
+                <div id="getBusinessesWithCapacityBetweenXAndYSuccess"></div>
+                <div id="getBusinessesWithCapacityBetweenXAndYTable"></div>
+            </div>
+
 		</div>
 	</body>
 
@@ -956,13 +973,23 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
+
 	    $result = executeSQL("SELECT * FROM CovidSupplies
-                            WHERE CovidSupplies.quantity<"
-                            . $_POST["x"],
+                            WHERE CovidSupplies.quantity<'"
+                            . $_POST["x"] . "'" ,
                              "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
+    }
+
+    function handleGetBusinessesWithCapacityBetweenXAndY() {
+	    $result = executeSQL("SELECT name, address, capacity FROM Business 
+                WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
+            "getBusinessesWithCapacityBetweenXAndYSuccess");
+        $headers = ["name", "address", "capacity"];
+        $altHeaders = null;
+        printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
     }
 
 
@@ -1013,6 +1040,8 @@ function handleAddPerishableConsumable() {
 				handleUpdateBusinessAddress();
 			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
+            } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
+                handleGetBusinessesWithCapacityBetweenXAndY();
             }
 
             disconnectDB();
