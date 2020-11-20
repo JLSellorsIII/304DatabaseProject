@@ -473,6 +473,17 @@
                 <div id="getCovidSuppliesTable"></div>
             </div>
             <div class="op-container">
+                <h2>Get All Customers who Visited Business</h2>
+                <form method="POST" action="index.php">
+                    <p>Business: </p>
+                    <select class="businessSelect" name="business">
+                    </select>
+                    <input type="submit" class="submit button" value="Get" name="getCustomersWhoVisitedBusiness">
+                </form>
+                <div id="getCustomersWhoVisitedBusinessSuccess"></div>
+                <div id="getCustomersWhoVisitedBusinessTable"></div>
+            </div>
+            <div class="op-container">
                 <h2>Get Businesses With Capacity Between X And Y</h2>
                 <form method="POST" action="index.php">
                     <div>
@@ -492,10 +503,10 @@
             <div class="op-container">
                 <h2>Get Customers Who visited all Businesses</h2>
                 <form method="POST" action="index.php">
-                    <input type="submit" class="submit button" value="Get" name="getCustomersWhoVistedAllBusinesses">
+                    <input type="submit" class="submit button" value="Get" name="getCustomersWhoVisitedAllBusinesses">
                 </form>
-                <div id="getCustomersWhoVistedAllBusinessesSuccess"></div>
-                <div id="getCustomersWhoVistedAllBusinessesTable"></div>
+                <div id="getCustomersWhoVisitedAllBusinessesSuccess"></div>
+                <div id="getCustomersWhoVisitedAllBusinessesTable"></div>
             </div>
 
 		</div>
@@ -930,7 +941,7 @@ function handleAddPerishableConsumable() {
             case "business":
                 $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
                 $headers = ["url", "name", "capacity", "bid", "address"];
-                $altHeaders = ["url", "Business", "Capacity", "Business ID", "Address"];
+                $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
             case "transaction":
@@ -991,12 +1002,12 @@ function handleAddPerishableConsumable() {
     }
 
     function handleGetBusinessesWithCapacityBetweenXAndY() {
-	    $result = executeSQL("SELECT name, address, capacity FROM Business 
+	    $result = executeSQL("SELECT * FROM Business 
                 WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
             "getBusinessesWithCapacityBetweenXAndYSuccess");
         $headers = ["name", "address", "capacity"];
         $altHeaders = null;
-        printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
+        printTable($result, $headers, $altHeaders, "mainTable");
     }
 
     function handleGetCustomersWhoVisitedAllBusinesses() {
@@ -1006,6 +1017,15 @@ function handleAddPerishableConsumable() {
         $headers = ["name"];
         $altHeaders = null;
         printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedAllBusinessesTable");
+    }
+
+    function handleGetCustomersWhoVisitedBusiness() {
+	    $result = executeSQL("SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
+CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_POST["business"] ."'", "getCustomersWhoVisitedBusinessSuccess");
+	    $headers = ["name", "pNumber"];
+	    $altHeaders = null;
+        printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedBusinessTable");
+
     }
 
 
@@ -1060,7 +1080,9 @@ function handleAddPerishableConsumable() {
                 handleGetBusinessesWithCapacityBetweenXAndY();
             } else if (array_key_exists( "getCustomersWhoVisitedAllBusinesses", $_POST)) {
                 handleGetCustomersWhoVisitedAllBusinesses();
-                     }
+            } else if (array_key_exists("getCustomersWhoVisitedBusiness", $_POST)) {
+                handleGetCustomersWhoVisitedBusiness();
+            }
             disconnectDB();
         }
     }
