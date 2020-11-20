@@ -175,6 +175,18 @@ INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
     (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0003, 30);
 
+    INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0001, 30);
+
+    INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0002, 30);
+
+    INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0004, 30);
+
+    INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
+    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0005, 30);
+
 INSERT INTO Violation(law, description) VALUES
     ('Overcapacity', 'The business has had more people in the store at one time than they are permitted to');
     INSERT INTO Violation(law, description) VALUES
