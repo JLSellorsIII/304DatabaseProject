@@ -374,6 +374,22 @@
 				</form>
 				<div id="updateViolationDescSuccess"></div>
             </div>
+			<div class="op-container">
+				<h2>Update Business Address</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Business: </p>
+						<select class="businessSelect" name="business">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Address: </p>
+                        <input type="text" name="address" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateBusinessAddress">
+				</form>
+				<div id="updateBusinessAddressSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -430,22 +446,18 @@
 				<div id="displayTableSuccess"></div>
 				<div id="mainTable"></div>
 			</div>
-
             <div class="op-container">
                 <h2>Get Covid Supplies with Quantity below X</h2>
-                <form method="POST" action="index.php">
+				<form method="POST" action="index.php">
                     <div>
                         <p>X:</p>
                         <input type="text" name="x">
                     </div>
-                    <input class="submit button" type="submit" value="Get" name="getCovidSuppliesBelowX">
+					<input type="submit" class="submit button" value="Get" name="getCovidSuppliesBelowX">
                 </form>
                 <div id="getCovidSuppliesBelowXSuccess"></div>
                 <div id="getCovidSuppliesTable"></div>
             </div>
-
-
-
 		</div>
 	</body>
 
@@ -582,8 +594,9 @@
 	function handleAddCustomer() {
         global $db_conn;
 
-        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
-		VALUES ('" . $_POST['cNum'] . "', '" . $_POST['cName'] . "')", "addCustomerSuccess");
+        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name) VALUES ('"
+                              . $_POST['cNum'] . "', '"
+                              . $_POST['cName'] . "')", "addCustomerSuccess");
 
         OCICommit($db_conn);
     }
@@ -594,10 +607,13 @@
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
         $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
-		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime)
-		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
-		" . $startTime . "" . $endTime . "')",
-		"addShiftSuccess");
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
+                              . $_POST['shiftID'] . "', '"
+                              . $_POST['bid'] . "', '"
+                              . $_POST['email'] . "', '"
+                              . $_POST['Wage'] . ", "
+                              . $startTime . ", "
+                              . $endTime . "')", "addShiftSuccess");
 		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
@@ -617,9 +633,12 @@
 	function handleAddBusiness() {
 	    global $db_conn;
 
-	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('" . $_POST['url'] . "
-	    ', '" . $_POST['name'] . "', '" . $_POST['capacity'] . "', '" . $_POST['bid'] . "', '" . $_POST['address'] . "')",
-	    "addBusinessSuccess");
+	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('"
+                             . $_POST['url'] . " ', '"
+                             . $_POST['name'] . "', '"
+                             . $_POST['capacity'] . "', '"
+                             . $_POST['bid'] . "', '"
+                             . $_POST['address'] . "')", "addBusinessSuccess");
 
 	    OCICommit($db_conn);
     }
@@ -785,6 +804,17 @@ function handleAddPerishableConsumable() {
                    "' WHERE law='" . $_POST['violation'] . "'", "updateViolationDescSuccess");
         OCICommit($db_conn);
     }
+	
+	function handleUpdateBusinessAddress() {
+        global $db_conn;
+        executeSQL("UPDATE Business
+                    SET address='" . $_POST['address'] . "'
+                    WHERE url='" . $_POST['url'] . "' AND "
+				   . "name='" . $_POST['name'] . "' AND "
+				   . "capacity='" . $_POST['capacity'] . "' AND "
+				   . "bid='" . $_POST['bid'] . "'", "updateBusinessAddressSuccess");
+        OCICommit($db_conn);
+    }
 
 	function printTable($result, $headers, $altHeaders, $elem) {
 		$tableString = "<table><tr>";
@@ -906,7 +936,10 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
-	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
+	    $result = executeSQL("SELECT * FROM CovidSupplies
+                            WHERE CovidSupplies.quantity<"
+                            . $_POST["x"],
+                             "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
@@ -954,9 +987,12 @@ function handleAddPerishableConsumable() {
 				handleUpdateWarningLevel();
 			} else if (array_key_exists("updateViolationDesc", $_POST)) {
 				handleUpdateViolationDesc();
-			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
+			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
+				handleUpdateBusinessAddress();
+			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
             }
+
             disconnectDB();
         }
     }
@@ -1049,22 +1085,7 @@ function handleAddPerishableConsumable() {
 			callJSFunc("printToElements('violationSelect', `" . $optionString . "`)");
         }
         disconnectDB();
-    }
-
-    function fillAccountSelect() {
-        if(connectDB()) {
-            $result = executeSQL(
-                "SELECT *
-                FROM Account", null);
-            $optionString = "";
-			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-				$optionString .= "<option value='" . $row["EMAIL"] . "'>" .
-					$row["EMAIL"] . "</option>";
-			}
-			callJSFunc("printToElements('accountSelect', `" . $optionString . "`)");
-        }
-        disconnectDB();
-    }
+    }	
 
     function fillTrackedFineSelect() {
         if(connectDB()) {
