@@ -406,7 +406,7 @@
                 <h2>Delete Shift</h2>
                 <form method="POST" action="index.php">
                     <div>
-                        <p>Fine: </p>
+                        <p>Shift: </p>
                         <select class="shiftSelect" name="shift">
                         </select>
                     </div>
@@ -612,7 +612,6 @@
 		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
 		" . $startTime . "" . $endTime . "')",
 		"addShiftSuccess");
-		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -833,7 +832,7 @@ function handleAddPerishableConsumable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
 				$result = executeSQL("SELECT * FROM ScheduledShift", "displayTableSuccess");
-				$headers = ["shiftID", "bid", "email", "Wage"];
+				$headers = ["shiftID", "bid", "email", "Wage", "startTime", "endTime"];
 				$altHeaders = null;
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
@@ -1018,8 +1017,8 @@ function fillShiftSelect() {
         $result = executeSQL("SELECT * FROM ScheduledShift", null);
         $optionString = "";
         while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            $optionString .= "<option value='" . $row["shiftID"] . "'>" .
-                $row["account"] . " - " . $row["business"] . " - " . $row["startTime"] . "</option>";
+            $optionString .= "<option value='" . $row["SHIFTID"] . "'>" .
+                $row["ACCOUNDT"] . " - " . $row["BUSINESS"] . " - " . $row["STARTTIME"] . "</option>";
         }
         callJSFunc("printToElements('shiftSelect', `" . $optionString . "`)");
     }
