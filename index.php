@@ -930,7 +930,7 @@ function handleAddPerishableConsumable() {
             case "business":
                 $result = executeSQL("SELECT * FROM Business", "displayTableSuccess");
                 $headers = ["url", "name", "capacity", "bid", "address"];
-                $altHeaders = ["url", "Business", "Capacity", "Business ID", "Address"];
+                $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
             case "transaction":
