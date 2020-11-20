@@ -115,16 +115,16 @@
 						<p>Shift ID: </p>
 						<input type="text" name="shiftID">
 					</div>
-					<div>
+                    <div>
                         <p>Business: </p>
-                        <select id="businessSelect" name="business">
+                        <select class="businessSelect" name="business">
                         </select>
-					</div>
-					<div>
-                        <p>Email: </p>
-                        <select id="accountSelect" name="account">
+                    </div>
+                    <div>
+                        <p>Account: </p>
+                        <select class="accountSelect" name="account">
                         </select>
-					</div>
+                    </div>
 					<div>
 						<p>Wage: </p>
 						<input type="text" name="Wage">
@@ -213,7 +213,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <div>
@@ -258,7 +258,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addCovidSupplies">
@@ -279,7 +279,7 @@
                         </div>
                         <div>
                             <p>Business: </p>
-                            <select id="businessSelect" name="business">
+                            <select class="businessSelect" name="business">
                             </select>
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
@@ -296,7 +296,7 @@
                     </div>
                     <div>
                         <p>Business: </p>
-                        <select id="businessSelect" name="business">
+                        <select class="businessSelect" name="business">
                         </select>
                     </div>
                     <input class="submit button" type="submit" value="Add" name="addNonPerishableConsumable">
@@ -417,6 +417,20 @@
 				</form>
 				<div id="deleteWarningSuccess"/>
 			</div>
+
+            <div class="op-container">
+                <h2>Delete Shift</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>Shift: </p>
+                        <select class="shiftSelect" name="shift">
+                        </select>
+                    </div>
+                    <input class="submit button" type="submit" value="Delete" name="deleteShift">
+                </form>
+                <div id="deleteShiftSuccess"/>
+            </div>
+
 		</div>
 		<div id="queries">
 			<h1>Queries</h1>
@@ -458,6 +472,32 @@
                 <div id="getCovidSuppliesBelowXSuccess"></div>
                 <div id="getCovidSuppliesTable"></div>
             </div>
+            <div class="op-container">
+                <h2>Get Businesses With Capacity Between X And Y</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>X:</p>
+                        <input type="number" name="x">
+                    </div>
+                    <div>
+                        <p>Y:</p>
+                        <input type="number" name="y">
+                    </div>
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesWithCapacityBetweenXAndY">
+                </form>
+                <div id="getBusinessesWithCapacityBetweenXAndYSuccess"></div>
+                <div id="getBusinessesWithCapacityBetweenXAndYTable"></div>
+            </div>
+
+            <div class="op-container">
+                <h2>Get Customers Who visited all Businesses</h2>
+                <form method="POST" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getCustomersWhoVistedAllBusinesses">
+                </form>
+                <div id="getCustomersWhoVistedAllBusinessesSuccess"></div>
+                <div id="getCustomersWhoVistedAllBusinessesTable"></div>
+            </div>
+
 		</div>
 	</body>
 
@@ -605,7 +645,7 @@
 		global $db_conn;
 
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
                               . $_POST['shiftID'] . "', '"
@@ -614,7 +654,7 @@
                               . $_POST['Wage'] . ", "
                               . $startTime . ", "
                               . $endTime . "')", "addShiftSuccess");
-		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
+		$result = executeSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -767,6 +807,12 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
+    function handleDeleteShift() {
+	    global $db_conn;
+	    executeSQL("DELETE FROM ScheduledShift WHERE shiftID='" . $_POST['shift'] . "'", "deleteShiftSuccess");
+	    OCICommit($db_conn);
+    }
+
     function handleUpdatePaid() {
         global $db_conn;
         $tracksInfo = preg_split("/_/", $_POST['fine']);
@@ -804,7 +850,7 @@ function handleAddPerishableConsumable() {
                    "' WHERE law='" . $_POST['violation'] . "'", "updateViolationDescSuccess");
         OCICommit($db_conn);
     }
-	
+
 	function handleUpdateBusinessAddress() {
         global $db_conn;
         executeSQL("UPDATE Business
@@ -841,7 +887,7 @@ function handleAddPerishableConsumable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
 				$result = executeSQL("SELECT * FROM ScheduledShift", "displayTableSuccess");
-				$headers = ["shiftID", "bid", "email", "Wage"];
+				$headers = ["shiftID", "bid", "email", "Wage", "startTime", "endTime"];
 				$altHeaders = null;
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
@@ -934,13 +980,32 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
+
 	    $result = executeSQL("SELECT * FROM CovidSupplies
-                            WHERE CovidSupplies.quantity<"
-                            . $_POST["x"],
+                            WHERE CovidSupplies.quantity<'"
+                            . $_POST["x"] . "'" ,
                              "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
+    }
+
+    function handleGetBusinessesWithCapacityBetweenXAndY() {
+	    $result = executeSQL("SELECT name, address, capacity FROM Business 
+                WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
+            "getBusinessesWithCapacityBetweenXAndYSuccess");
+        $headers = ["name", "address", "capacity"];
+        $altHeaders = null;
+        printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
+    }
+
+    function handleGetCustomersWhoVisitedAllBusinesses() {
+	    $result = executeSQL("SELECT name FROM VisitedTime, CustomerPartyContact WHERE
+            VisitedTime.pNumber = CustomerPartyContact.pNumber AND NOT EXISTS((SELECT bid FROM Business as b) 
+            EXCEPT (SELECT bid FROM VisitedTime WHERE VisitedTime.bid = b.bid))" ,"getCustomersWhoVisitedAllBusinessesSuccess");
+        $headers = ["name"];
+        $altHeaders = null;
+        printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedAllBusinessesTable");
     }
 
 
@@ -977,6 +1042,8 @@ function handleAddPerishableConsumable() {
 				handleDeleteFine();
 			} else if (array_key_exists("deleteWarning", $_POST)) {
 				handleDeleteWarning();
+				} else if (array_key_exists("deleteShift", $_POST)) {
+                handleDeleteShift();
 			} else if (array_key_exists("updatePaid", $_POST)) {
 				handleUpdatePaid();
 			} else if (array_key_exists("updateFineAmount", $_POST)) {
@@ -989,8 +1056,11 @@ function handleAddPerishableConsumable() {
 				handleUpdateBusinessAddress();
 			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
-            }
-
+            } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
+                handleGetBusinessesWithCapacityBetweenXAndY();
+            } else if (array_key_exists( "getCustomersWhoVisitedAllBusinesses", $_POST)) {
+                handleGetCustomersWhoVisitedAllBusinesses();
+                     }
             disconnectDB();
         }
     }
@@ -1012,19 +1082,6 @@ function handleAddPerishableConsumable() {
 		handleGETRequest();
 	}
 
-	function fillAccountSelect() {
-	    if(connectDB()) {
-	        $result = executeSQL("SELECT * FROM Account", null);
-	        $optionString = "";
-	        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-	            $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
-                    $row["EMAIL"] . "</option>";
-            }
-            callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
-        }
-	    disconnectDB();
-    }
-
 	function fillCustomerSelect() {
 		if(connectDB()) {
 			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
@@ -1037,6 +1094,32 @@ function handleAddPerishableConsumable() {
 		}
 		disconnectDB();
 	}
+
+function fillAccountSelect() {
+    if(connectDB()) {
+        $result = executeSQL("SELECT * FROM Account", null);
+        $optionString = "";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
+                $row["EMAIL"] . "</option>";
+        }
+        callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
+    }
+    disconnectDB();
+}
+
+function fillShiftSelect() {
+    if(connectDB()) {
+        $result = executeSQL("SELECT * FROM ScheduledShift", null);
+        $optionString = "";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $optionString .= "<option value='" . $row["SHIFTID"] . "'>" .
+                $row["ACCOUNT"] . " - " . $row["BUSINESS"] . " - " . $row["STARTTIME"] . "</option>";
+        }
+        callJSFunc("printToElements('shiftSelect', `" . $optionString . "`)");
+    }
+    disconnectDB();
+}
 
 	function fillBusinessSelect() {
 		if(connectDB()) {
@@ -1096,7 +1179,7 @@ function handleAddPerishableConsumable() {
 			callJSFunc("printToElements('violationSelect', `" . $optionString . "`)");
         }
         disconnectDB();
-    }	
+    }
 
     function fillTrackedFineSelect() {
         if(connectDB()) {
@@ -1127,6 +1210,6 @@ function handleAddPerishableConsumable() {
     fillViolationSelect();
     fillAccountSelect();
     fillTrackedFineSelect();
-	fillAccountSelect();
+    fillShiftSelect();
 ?>
 </html>
