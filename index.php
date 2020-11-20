@@ -509,6 +509,15 @@
                 <div id="getCustomersWhoVisitedAllBusinessesTable"></div>
             </div>
 
+            <div class="op-container">
+                <h2>Get Visits by pNumber</h2>
+                <form method="POST" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getVisitsBypNumber">
+                </form>
+                <div id="getVisitsBypNumberSuccess"></div>
+                <div id="getVisitsBypNumberTable"></div>
+            </div>
+
 		</div>
 	</body>
 
@@ -1028,6 +1037,13 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
 
     }
 
+    function handleGetVisitsBypNumber() {
+	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber");
+	    $headers = ["count(*) pNumber", "pNumber"];
+	    $altHeaders = null;
+	    printTable($result, $headers, $altHeaders, "getVisitsBypNumberTable");
+    }
+
 
 	function handlePOSTRequest()
     {
@@ -1082,6 +1098,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
                 handleGetCustomersWhoVisitedAllBusinesses();
             } else if (array_key_exists("getCustomersWhoVisitedBusiness", $_POST)) {
                 handleGetCustomersWhoVisitedBusiness();
+            } else if (array_key_exists("getVisitsBypNumber", $_POST)) {
+                handleGetVisitsBypNumber();
             }
             disconnectDB();
         }
