@@ -401,6 +401,20 @@
 				</form>
 				<div id="deleteWarningSuccess"/>
 			</div>
+
+            <div class="op-container">
+                <h2>Delete Shift</h2>
+                <form method="POST" action="index.php">
+                    <div>
+                        <p>Fine: </p>
+                        <select class="shiftSelect" name="shift">
+                        </select>
+                    </div>
+                    <input class="submit button" type="submit" value="Delete" name="deleteShift">
+                </form>
+                <div id="deleteShiftSuccess"/>
+            </div>
+
 		</div>
 		<div id="queries">
 			<h1>Queries</h1>
@@ -437,8 +451,8 @@
                     <div>
                         <p>X:</p>
                         <input type="text" name="x">
-                    </div>
-                    <input class="submit button" type="submit" value="Get" name="getCovidSuppliesBelowX">
+                   </div>
+                    <input type="submit" class="submit button" value="Get" name="getCovidSuppliesBelowX">
                 </form>
                 <div id="getCovidSuppliesBelowXSuccess"></div>
                 <div id="getCovidSuppliesTable"></div>
@@ -748,6 +762,12 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
+    function handleDeleteShift() {
+	    global $db_conn;
+	    executeSQL("DELETE FROM ScheduledShift WHERE shiftID='" . $_POST['shift'] . "'", "deleteShiftSuccess");
+	    OCICommit($db_conn);
+    }
+
     function handleUpdatePaid() {
         global $db_conn;
         $tracksInfo = preg_split("/_/", $_POST['fine']);
@@ -906,7 +926,7 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
-	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
+	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'", "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
@@ -946,6 +966,8 @@ function handleAddPerishableConsumable() {
 				handleDeleteFine();
 			} else if (array_key_exists("deleteWarning", $_POST)) {
 				handleDeleteWarning();
+				} else if (array_key_exists("deleteShift", $_POST)) {
+                handleDeleteShift();
 			} else if (array_key_exists("updatePaid", $_POST)) {
 				handleUpdatePaid();
 			} else if (array_key_exists("updateFineAmount", $_POST)) {
@@ -990,6 +1012,19 @@ function handleAddPerishableConsumable() {
 		}
 		disconnectDB();
 	}
+
+function fillShiftSelect() {
+    if(connectDB()) {
+        $result = executeSQL("SELECT * FROM ScheduledShift", null);
+        $optionString = "";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $optionString .= "<option value='" . $row["shiftID"] . "'>" .
+                $row["account"] . " - " . $row["business"] . " - " . $row["startTime"] . "</option>";
+        }
+        callJSFunc("printToElements('shiftSelect', `" . $optionString . "`)");
+    }
+    disconnectDB();
+}
 
 	function fillBusinessSelect() {
 		if(connectDB()) {
@@ -1095,5 +1130,6 @@ function handleAddPerishableConsumable() {
     fillViolationSelect();
     fillAccountSelect();
     fillTrackedFineSelect();
+    fillShiftSelect();
 ?>
 </html>
