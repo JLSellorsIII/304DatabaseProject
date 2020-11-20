@@ -489,6 +489,15 @@
                 <div id="getBusinessesWithCapacityBetweenXAndYTable"></div>
             </div>
 
+            <div class="op-container">
+                <h2>Get Customers Who visited all Businesses</h2>
+                <form method="POST" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getCustomersWhoVistedAllBusinesses">
+                </form>
+                <div id="getCustomersWhoVistedAllBusinessesSuccess"></div>
+                <div id="getCustomersWhoVistedAllBusinessesTable"></div>
+            </div>
+
 		</div>
 	</body>
 
@@ -636,7 +645,7 @@
 		global $db_conn;
 
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
                               . $_POST['shiftID'] . "', '"
@@ -645,7 +654,7 @@
                               . $_POST['Wage'] . ", "
                               . $startTime . ", "
                               . $endTime . "')", "addShiftSuccess");
-		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
+		$result = executeSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -990,6 +999,15 @@ function handleAddPerishableConsumable() {
         printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
     }
 
+    function handleGetCustomersWhoVisitedAllBusinesses() {
+	    $result = executeSQL("SELECT name FROM VisitedTime, CustomerPartyContact WHERE
+            VisitedTime.pNumber = CustomerPartyContact.pNumber AND NOT EXISTS((SELECT bid FROM Business as b) 
+            EXCEPT (SELECT bid FROM VisitedTime WHERE VisitedTime.bid = b.bid))" ,"getCustomersWhoVisitedAllBusinessesSuccess");
+        $headers = ["name"];
+        $altHeaders = null;
+        printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedAllBusinessesTable");
+    }
+
 
 	function handlePOSTRequest()
     {
@@ -1040,8 +1058,9 @@ function handleAddPerishableConsumable() {
                 handleGetCovidSuppliesBelowX();
             } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
                 handleGetBusinessesWithCapacityBetweenXAndY();
-            }
-
+            } else if (array_key_exists( "getCustomersWhoVisitedAllBusinesses", $_POST)) {
+                handleGetCustomersWhoVisitedAllBusinesses();
+                     }
             disconnectDB();
         }
     }
@@ -1095,7 +1114,7 @@ function fillShiftSelect() {
         $optionString = "";
         while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             $optionString .= "<option value='" . $row["SHIFTID"] . "'>" .
-                $row["ACCOUNDT"] . " - " . $row["BUSINESS"] . " - " . $row["STARTTIME"] . "</option>";
+                $row["ACCOUNT"] . " - " . $row["BUSINESS"] . " - " . $row["STARTTIME"] . "</option>";
         }
         callJSFunc("printToElements('shiftSelect', `" . $optionString . "`)");
     }
