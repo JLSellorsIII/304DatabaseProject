@@ -598,8 +598,9 @@
 	function handleAddCustomer() {
         global $db_conn;
 
-        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name)
-		VALUES ('" . $_POST['cNum'] . "', '" . $_POST['cName'] . "')", "addCustomerSuccess");
+        $result  = executeSQL("INSERT INTO customerPartyContact(pNumber, name) VALUES ('"
+                              . $_POST['cNum'] . "', '"
+                              . $_POST['cName'] . "')", "addCustomerSuccess");
 
         OCICommit($db_conn);
     }
@@ -610,10 +611,13 @@
         $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
         $endTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
-		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime)
-		VALUES ('" . $_POST['shiftID'] . "', '" . $_POST['bid'] . "', '" . $_POST['email'] . "', '" . $_POST['Wage'] . "
-		" . $startTime . "" . $endTime . "')",
-		"addShiftSuccess");
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
+                              . $_POST['shiftID'] . "', '"
+                              . $_POST['bid'] . "', '"
+                              . $_POST['email'] . "', '"
+                              . $_POST['Wage'] . ", "
+                              . $startTime . ", "
+                              . $endTime . "')", "addShiftSuccess");
 		$result = exectuteSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
 		OCICommit($db_conn);
 	}
@@ -633,9 +637,12 @@
 	function handleAddBusiness() {
 	    global $db_conn;
 
-	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('" . $_POST['url'] . "
-	    ', '" . $_POST['name'] . "', '" . $_POST['capacity'] . "', '" . $_POST['bid'] . "', '" . $_POST['address'] . "')",
-	    "addBusinessSuccess");
+	    $result = executeSQL("INSERT INTO Business(url, name, capacity, bid, address) VALUES ('"
+                             . $_POST['url'] . " ', '"
+                             . $_POST['name'] . "', '"
+                             . $_POST['capacity'] . "', '"
+                             . $_POST['bid'] . "', '"
+                             . $_POST['address'] . "')", "addBusinessSuccess");
 
 	    OCICommit($db_conn);
     }
@@ -1093,21 +1100,6 @@ function handleAddPerishableConsumable() {
         }
         disconnectDB();
     }	
-
-    function fillAccountSelect() {
-        if(connectDB()) {
-            $result = executeSQL(
-                "SELECT *
-                FROM Account", null);
-            $optionString = "";
-			while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-				$optionString .= "<option value='" . $row["EMAIL"] . "'>" .
-					$row["EMAIL"] . "</option>";
-			}
-			callJSFunc("printToElements('accountSelect', `" . $optionString . "`)");
-        }
-        disconnectDB();
-    }
 
     function fillTrackedFineSelect() {
         if(connectDB()) {
