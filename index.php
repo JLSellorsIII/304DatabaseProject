@@ -446,22 +446,18 @@
 				<div id="displayTableSuccess"></div>
 				<div id="mainTable"></div>
 			</div>
-
             <div class="op-container">
                 <h2>Get Covid Supplies with Quantity below X</h2>
-                <form method="POST" action="index.php">
+				<form method="POST" action="index.php">
                     <div>
                         <p>X:</p>
                         <input type="text" name="x">
                     </div>
-                    <input class="submit button" type="submit" value="Get" name="getCovidSuppliesBelowX">
+					<input type="submit" class="submit button" value="Get" name="getCovidSuppliesBelowX">
                 </form>
                 <div id="getCovidSuppliesBelowXSuccess"></div>
                 <div id="getCovidSuppliesTable"></div>
             </div>
-
-
-
 		</div>
 	</body>
 
@@ -940,7 +936,10 @@ function handleAddPerishableConsumable() {
 	}
 
 	function handleGetCovidSuppliesBelowX() {
-	    $result = executeSQL("SELECT * FROM CovidSupplies WHERE CovidSupplies.quantity <'" . $_POST["x"] . "'");
+	    $result = executeSQL("SELECT * FROM CovidSupplies
+                            WHERE CovidSupplies.quantity<"
+                            . $_POST["x"],
+                             "getCovidSuppliesBelowXSuccess");
 	    $headers = ["csid", "quantity", "bid"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
@@ -990,9 +989,9 @@ function handleAddPerishableConsumable() {
 				handleUpdateViolationDesc();
 			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
 				handleUpdateBusinessAddress();
-			} else if (array_key_exits('getCovidSuppliesBelowX', $_POST)) {
+			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
-      }
+            }
 
             disconnectDB();
         }
