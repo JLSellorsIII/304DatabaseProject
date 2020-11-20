@@ -809,10 +809,8 @@ function handleAddPerishableConsumable() {
         global $db_conn;
         executeSQL("UPDATE Business
                     SET address='" . $_POST['address'] . "'
-                    WHERE url='" . $_POST['url'] . "' AND "
-				   . "name='" . $_POST['name'] . "' AND "
-				   . "capacity='" . $_POST['capacity'] . "' AND "
-				   . "bid='" . $_POST['bid'] . "'", "updateBusinessAddressSuccess");
+                    WHERE " . "bid=" . $_POST['business'],
+                   "updateBusinessAddressSuccess");
         OCICommit($db_conn);
     }
 
