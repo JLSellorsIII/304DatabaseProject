@@ -1038,8 +1038,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
     }
 
     function handleGetVisitsBypNumber() {
-	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber");
-	    $headers = ["count(*) pNumber", "pNumber"];
+	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
+	    $headers = ["count", "pNumber"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getVisitsBypNumberTable");
     }
