@@ -244,6 +244,32 @@
                     </form>
                     <div id="addAccountSuccess"/>
                 </div>
+				
+				<div class="op-container">
+                    <h2>Add Write Permission to Account</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>Email Address: </p>
+                            <select class="accountSelect" name="account">
+							</select>
+                        </div>
+                        <div>
+                            <p>Business: </p>
+                            <select class="businessSelect" name="business">
+							</select>
+                        </div>
+						<div>
+                            <p>Write Permission: </p>
+                            <select id="permission" name="permission">
+								<option value=null>N/A</option>
+								<option value=1>Yes</option>
+								<option value=0>No</option>
+							</select>
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addAccess">
+                    </form>
+                    <div id="addAccessSuccess"/>
+                </div>
 
                 <div class="op-container">
                     <h2>Add Covid Supplies</h2>
@@ -494,6 +520,7 @@
 							<option value="account">Account</option>
 							<option value="tracksDate">TracksDate</option>
 							<option value="tracksPaid">TracksPaid</option>
+							<option value="accesses">Accesses</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable">
 				</form>
@@ -839,6 +866,15 @@ function handleAddPerishableConsumable() {
                    . $_POST['paid'] . ")", "addTracksSuccess");
         OCICommit($db_conn);
     }
+	
+	function handleAddAccess() {
+        global $db_conn;
+        executeSQL("INSERT INTO Accesses(email, bid, writePermission)
+                    VALUES ('" . $_POST['account'] . "', 
+                   ". "'" . $_POST['business'] . "', 
+                   ". $_POST['permission'] . ")", "addAccessSuccess");
+        OCICommit($db_conn);
+    }
 
     function handleDeleteFine() {
         global $db_conn;
@@ -860,7 +896,7 @@ function handleAddPerishableConsumable() {
 		
 	function handleDeleteAccount() {
         global $db_conn;
-        executeSQL("DELETE FROM Account WHERE email='" . $_POST['email'] . "'",
+        executeSQL("DELETE FROM Account WHERE email='". $_POST['email'] . "'",
                 "deleteAccountSuccess");
         OCICommit($db_conn);
     }
@@ -1037,6 +1073,12 @@ function handleAddPerishableConsumable() {
 				$altHeaders = ["Email Address", "Password"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
+			case "accesses":
+				$result = executeSQL("SELECT * FROM Accesses", "displayTableSuccess");
+				$headers = ["email", "bid", "writePermission"];
+				$altHeaders = ["Email Address", "Business ID", "Write Permission"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
             case "tracksDate":
                 $result = executeSQL("SELECT * FROM TracksDate", "displayTableSuccess");
                 $headers = ["bid", "email", "law", "violationDate"];
@@ -1118,6 +1160,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
                 handleAddPerishableConsumable();
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
+			} else if (array_key_exists("addAccess", $_POST)) {
+				handleAddAccess();
 			} else if (array_key_exists("addTracks", $_POST)) {
 				handleAddTracks();
 			} else if (array_key_exists("deleteFine", $_POST)) {
