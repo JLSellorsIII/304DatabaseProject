@@ -487,11 +487,11 @@
                 <h2>Get Businesses With Capacity Between X And Y</h2>
                 <form method="POST" action="index.php">
                     <div>
-                        <p>X:</p>
+                        <p>X (Lower bound):</p>
                         <input type="number" name="x">
                     </div>
                     <div>
-                        <p>Y:</p>
+                        <p>Y (Upper bound):</p>
                         <input type="number" name="y">
                     </div>
                     <input type="submit" class="submit button" value="Get" name="getBusinessesWithCapacityBetweenXAndY">
@@ -1002,12 +1002,12 @@ function handleAddPerishableConsumable() {
     }
 
     function handleGetBusinessesWithCapacityBetweenXAndY() {
-	    $result = executeSQL("SELECT * FROM Business 
+	    $result = executeSQL("SELECT * FROM Business
                 WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
             "getBusinessesWithCapacityBetweenXAndYSuccess");
         $headers = ["name", "address", "capacity"];
         $altHeaders = null;
-        printTable($result, $headers, $altHeaders, "mainTable");
+        printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
     }
 
     function handleGetCustomersWhoVisitedAllBusinesses() {
