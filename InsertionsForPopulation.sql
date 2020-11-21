@@ -1,17 +1,17 @@
 INSERT INTO Business(url, name, capacity, bid, address) VALUES
-    ('chuckschocs.ca', 'Chuck''s Chocolates', 30, 0001, '1000 Cocoa Lane');
+    ('chuckschocs.ca', 'Chucks Chocolates', 30, 0001, '1000 Cocoa Lane');
 
 INSERT INTO Business(url, name, capacity, bid, address) VALUES
-    ('patspies.ca', 'Pat''s Pies', 40, 0002, '2000 Tree Street');
+    ('patspies.ca', 'Pats Pies', 40, 0002, '2000 Tree Street');
 
 INSERT INTO Business(url, name, capacity,bid, address) VALUES
-    ('bradsbakery.ca', 'Brad''s Bakery', 20, 0003, '1500 Maple Drive');
+    ('bradsbakery.ca', 'Brads Bakery', 20, 0003, '1500 Maple Drive');
 
 INSERT INTO Business(url, name, capacity,bid, address) VALUES
     ('washingtonpizzafactory.com', 'Washington Pizza Factory', 60, 0004, '1400 Pen Boulevard');
 
 INSERT INTO Business(url, name, capacity,bid, address) VALUES
-    ('samssandwiches.ca', 'Sam''s Sandwiches', 45, 0005, '2500 Nathan Lane');
+    ('samssandwiches.ca', 'Sams Sandwiches', 45, 0005, '2500 Nathan Lane');
 
 INSERT INTO Account(email, password) VALUES
     ('bob@uncle.com', 'hunter2');
