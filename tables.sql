@@ -109,8 +109,8 @@ CREATE TABLE CovidSupplies
 /* ON UPDATE CASCADE */);
 
 CREATE TABLE ScheduledTime
-(startTime TIMESTAMP,
- endTime TIMESTAMP,
+(startTime DATE,
+ endTime DATE,
  duration DECIMAL(4,2),
  PRIMARY KEY (startTime, endTime));
 
