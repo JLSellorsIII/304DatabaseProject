@@ -765,7 +765,7 @@ function handleAddPerishableConsumable() {
         $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
                                 FROM VisitedLength
                                 WHERE VisitedLength.arrivalTime='" . $startTime . "'
-                                AND VisitedLength.duration='" . $$_POST["duration"]
+                                AND VisitedLength.duration='" . $_POST["duration"]
                                 . "'", null), OCI_NUM);
         if(count($timeArray) < 2) {
             executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
