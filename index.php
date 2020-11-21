@@ -655,17 +655,28 @@
 	function handleAddShift() {
 		global $db_conn;
 
-        $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
+        $startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("d.m.Y:H:i:s", strtotime($_POST['endTime']));
+        $duration = (strtotime($endTime) - strtoTime($startTime))/3600;
 
-		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
-                              . $_POST['shiftID'] . "', '"
-                              . $_POST['bid'] . "', '"
-                              . $_POST['email'] . "', '"
-                              . $_POST['Wage'] . ", "
-                              . $startTime . ", "
-                              . $endTime . "')", "addShiftSuccess");
-		$result = executeSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
+        $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
+                                FROM ScheduledTime
+                                WHERE startTime='" . $startTime . "'
+                                AND endTime='" . $endTime
+                                . "')", null), OCI_NUM);
+        if(count($timeArray) < 2) {
+            $result = executeSQL("INSERT INTO ScheduledTime(startTime,endTime,duration)
+            VALUES (TO_DATE('" . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), TO_DATE('"
+                                 . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'), " . $duration . ")","addShiftSuccess");
+        }
+
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ("
+                              . $_POST['shiftID'] . ", "
+                              . $_POST['business'] . ", '"
+                              . $_POST['account'] . "', "
+                              . $_POST['Wage'] . ", TO_DATE('"
+                              . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), TO_DATE('"
+                              . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'))", "addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -748,7 +759,6 @@ function handleAddPerishableConsumable() {
 
 	function handleAddVisitor() {
 		global $db_conn;
-		$endTime = $_POST['startTime'] + $_POST['duration'];
 		$startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
 		$endTime = date("d.m.Y:H:i:s",
 						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
