@@ -1125,7 +1125,7 @@ function fillAccountSelect() {
             $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
                 $row["EMAIL"] . "</option>";
         }
-        callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
+        callJSFunc("printToElements('accountSelect', `" . $optionString . "`)");
     }
     disconnectDB();
 }
