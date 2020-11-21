@@ -390,6 +390,22 @@
 				</form>
 				<div id="updateBusinessAddressSuccess"></div>
             </div>
+			<div class="op-container">
+				<h2>Update Account Email</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Account: </p>
+						<select class="accountSelect" name="account">
+                        </select>
+					</div>
+                    <div>
+                        <p>New Email: </p>
+                        <input type="text" name="newEmail" />
+                    </div>
+					<input type="submit" class="submit button" value="Update" name="updateAccountEmail">
+				</form>
+				<div id="updateAccountEmailSuccess"></div>
+            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -416,6 +432,30 @@
 					<input class="submit button" type="submit" value="Delete" name="deleteWarning">
 				</form>
 				<div id="deleteWarningSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Delete Account</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Account: </p>
+						<select class="accountSelect" name="account">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteAccount">
+				</form>
+				<div id="deleteAccountSuccess"/>
+			</div>
+			<div class="op-container">
+				<h2>Delete Business</h2>
+				<form method="POST" action="index.php">
+					<div>
+						<p>Business: </p>
+						<select class="businessSelect" name="business">
+						</select>
+					</div>
+					<input class="submit button" type="submit" value="Delete" name="deleteBusiness">
+				</form>
+				<div id="deleteBusinessSuccess"/>
 			</div>
 
             <div class="op-container">
@@ -451,7 +491,7 @@
                             <option value="covidSupplies">CovidSupplies</option>
                             <option value="nonPerishableConsumables">NonPerishableConsumables</option>
                             <option value="perishableConsumables">PerishableConsumables</option>
-							<option value="Account">Account</option>
+							<option value="account">Account</option>
 							<option value="tracksDate">TracksDate</option>
 							<option value="tracksPaid">TracksPaid</option>
 						</select>
@@ -487,11 +527,11 @@
                 <h2>Get Businesses With Capacity Between X And Y</h2>
                 <form method="POST" action="index.php">
                     <div>
-                        <p>X:</p>
+                        <p>X (Lower bound):</p>
                         <input type="number" name="x">
                     </div>
                     <div>
-                        <p>Y:</p>
+                        <p>Y (Upper bound):</p>
                         <input type="number" name="y">
                     </div>
                     <input type="submit" class="submit button" value="Get" name="getBusinessesWithCapacityBetweenXAndY">
@@ -826,6 +866,20 @@ function handleAddPerishableConsumable() {
                 "deleteFineSuccess");
         OCICommit($db_conn);
     }
+		
+	function handleDeleteAccount() {
+        global $db_conn;
+        executeSQL("DELETE FROM Account WHERE email='" . $_POST['email'] . "'",
+                "deleteAccountSuccess");
+        OCICommit($db_conn);
+    }
+	
+	function handleDeleteBusiness() {
+        global $db_conn;
+        executeSQL("DELETE FROM Business WHERE " . "bid=" . $_POST['business'],
+                "deleteBusinessSuccess");
+        OCICommit($db_conn);
+    }
 
     function handleDeleteShift() {
 	    global $db_conn;
@@ -877,6 +931,14 @@ function handleAddPerishableConsumable() {
                     SET address='" . $_POST['address'] . "'
                     WHERE " . "bid=" . $_POST['business'],
                    "updateBusinessAddressSuccess");
+        OCICommit($db_conn);
+    }
+	
+	function handleUpdateAccountEmail() {
+        global $db_conn;
+        executeSQL("UPDATE Account
+                    SET email='" . $_POST['newEmail'] . "'
+                    WHERE email='" . $_POST['email'] . "'", "updateAccountEmailSuccess");
         OCICommit($db_conn);
     }
 
@@ -980,7 +1042,7 @@ function handleAddPerishableConsumable() {
                 $altHeaders = null;
                 printTable($result, $headers, $altHeaders, "mainTable");
                 break;
-			case "Account":
+			case "account":
 				// For testing; probably should not display Password in production
 				$result = executeSQL("SELECT * FROM Account", "displayTableSuccess");
 				$headers = ["email", "password"];
@@ -1014,12 +1076,12 @@ function handleAddPerishableConsumable() {
     }
 
     function handleGetBusinessesWithCapacityBetweenXAndY() {
-	    $result = executeSQL("SELECT * FROM Business 
+	    $result = executeSQL("SELECT * FROM Business
                 WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
             "getBusinessesWithCapacityBetweenXAndYSuccess");
         $headers = ["name", "address", "capacity"];
         $altHeaders = null;
-        printTable($result, $headers, $altHeaders, "mainTable");
+        printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
     }
 
     function handleGetCustomersWhoVisitedAllBusinesses() {
@@ -1091,7 +1153,11 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
 				handleDeleteFine();
 			} else if (array_key_exists("deleteWarning", $_POST)) {
 				handleDeleteWarning();
-				} else if (array_key_exists("deleteShift", $_POST)) {
+			} else if (array_key_exists("deleteAccount", $_POST)) {
+				handleDeleteAccount();
+			} else if (array_key_exists("deleteBusiness", $_POST)) {
+				handleDeleteBusiness();
+			} else if (array_key_exists("deleteShift", $_POST)) {
                 handleDeleteShift();
 			} else if (array_key_exists("updatePaid", $_POST)) {
 				handleUpdatePaid();
@@ -1103,6 +1169,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
 				handleUpdateViolationDesc();
 			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
 				handleUpdateBusinessAddress();
+			} else if (array_key_exists("updateAccountEmail", $_POST)) {
+				handleUpdateAccountEmail();
 			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
             } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
@@ -1156,7 +1224,7 @@ function fillAccountSelect() {
             $optionString .= "<option value='" .$row["EMAIL"] . "'>" .
                 $row["EMAIL"] . "</option>";
         }
-        callJSFunc("printToElement('accountSelect', `" . $optionString . "`)");
+        callJSFunc("printToElements('accountSelect', `" . $optionString . "`)");
     }
     disconnectDB();
 }
