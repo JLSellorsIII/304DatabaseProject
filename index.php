@@ -906,7 +906,7 @@ function handleAddPerishableConsumable() {
 		
 	function handleDeleteAccount() {
         global $db_conn;
-        executeSQL("DELETE FROM Account WHERE email='". $_POST['email'] . "'",
+        executeSQL("DELETE FROM Account WHERE email='". $_POST['account'] . "'",
                 "deleteAccountSuccess");
         OCICommit($db_conn);
     }
@@ -973,10 +973,29 @@ function handleAddPerishableConsumable() {
 	
 	function handleUpdateAccountEmail() {
         global $db_conn;
+		/*
+		if(executeSQL(SELECT 1 FROM Accesses WHERE "'" . $_POST['account'] . "' IN email") == 1) {
+			*/
+			executeSQL("UPDATE Accesses
+                    SET email='" . $_POST['newEmail'] . "'
+                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//} else if("SELECT * FROM ScheduledShift WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE ScheduledShift
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");	
+		//} else if("SELECT * FROM TracksDate WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE TracksDate
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//} else if("SELECT * FROM TracksPaid WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE TracksPaid
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//}
         executeSQL("UPDATE Account
                     SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['email'] . "'", "updateAccountEmailSuccess");
-        OCICommit($db_conn);
+                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+       OCICommit($db_conn);
     }
 
 	function printTable($result, $headers, $altHeaders, $elem) {
