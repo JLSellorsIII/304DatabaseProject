@@ -880,29 +880,32 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 
-	function printTable($result, $headers, $altHeaders, $elem) {
-		$tableString = "<table><tr>";
-		if($altHeaders != null) {
-			foreach($altHeaders as &$header) {
-				$tableString .= "<th>" . $header . "</th>";
-			}
-		}else {
-			foreach($headers as &$header) {
-				$tableString .= "<th>" . $header . "</th>";
-			}
-		}
-		$tableString .= "</tr>";
+	function printTable($result, $headers, $altHeaders, $elem)
+    {
+        $tableString = "<table><tr>";
+        if ($altHeaders != null) {
+            foreach ($altHeaders as &$header) {
+                $tableString .= "<th>" . $header . "</th>";
+            }
+        } else {
+            foreach ($headers as &$header) {
+                $tableString .= "<th>" . $header . "</th>";
+            }
+        }
+        $tableString .= "</tr>";
 
-		while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			$tableString .= "<tr>";
-			foreach($headers as &$header) {
-				$tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
-			}
-			$tableString .= "</tr>";
-		}
-		$tableString .= "</table>";
-		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
-	}
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+            foreach ($headers as &$header) {
+                $tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
+            }
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
+            }
+
+
 	function handleDisplayTable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
@@ -1039,9 +1042,19 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
 
     function handleGetVisitsBypNumber() {
 	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
-	    $headers = ["count", "pNumber"];
-	    $altHeaders = null;
-	    printTable($result, $headers, $altHeaders, "getVisitsBypNumberTable");
+        $tableString = "<table><tr>";
+        $elem = "getVisitsBypNumberTable";
+        $tableString .= "<th>" . "count" . "</th>";
+        $tableString .= "<th>" . "pNumber" . "</th>";
+        $tableString .= "</tr>";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+                $tableString .= "<td>" . $row[0] . "</td>";
+            $tableString .= "<td>" . $row[1] . "</td>";
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
 
