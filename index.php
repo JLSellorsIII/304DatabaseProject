@@ -576,6 +576,40 @@
                 <div id="getCustomersWhoVisitedAllBusinessesTable"></div>
             </div>
 
+            <div class="op-container">
+                <h2>Get Visits by pNumber</h2>
+                <form method="POST" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getVisitsBypNumber">
+                </form>
+                <div id="getVisitsBypNumberSuccess"></div>
+                <div id="getVisitsBypNumberTable"></div>
+            </div>
+
+            <div class=op-container">
+                <h2>Get Transactions grouped by business with totals over X</h2>
+                <form method="POST" action ="index.php">
+                    <p>x: </p>
+                    <input type="number" name="x">
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
+                </form>
+                <div id ="getBusinessesVisitedByCustomerSuccess"></div>
+                <div id ="getBusinessesVisitedByCustomerTable"></div>
+        </div>
+
+            <div class=op-container">
+                <h2>Get Businesses Visited By Customer</h2>
+                <form method="POST" action ="index.php">
+                    <p>customer: </p>
+                    <select class="customerSelect" name="customer">
+                    </select>
+                    <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
+                </form>
+                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
+                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
+            </div>
+
+
+
 		</div>
 	</body>
 
@@ -777,7 +811,7 @@
         $transactionDate = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
 	    $result = executeSQL("INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('" .
-            $_POST['tid'] . "', '" . $_POST['bid'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
+            $_POST['tid'] . "', '" . $_POST['business'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
             "addTransactionSuccess");
 
 	    OCICommit($db_conn);
@@ -787,7 +821,7 @@
         global $db_conn;
 
         $result = executeSQL("INSERT INTO CovidSupplies(quantity, csid, bid) VALUES ('" .
-            $_POST['quantity'] . "', '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+            $_POST['quantity'] . "', '" . $_POST['csid'] . "', '" . $_POST['business'] . "')",
             "addCovidSuppliesSuccess");
 
         OCICommit($db_conn);
@@ -797,7 +831,7 @@ function handleAddNonPerishableConsumable() {
     global $db_conn;
 
     $result = executeSQL("INSERT INTO CovidSupplies(cid, bid) VALUES (
- '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+ '" . $_POST['csid'] . "', '" . $_POST['business'] . "')",
         "addNonPerishableConsumableSuccess");
 
     OCICommit($db_conn);
@@ -807,7 +841,7 @@ function handleAddPerishableConsumable() {
     global $db_conn;
 
     $result = executeSQL("INSERT INTO PerishableConsumable(expirationDate, cid, bid) VALUES ('" .
-        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['bid'] . "')",
+        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['business'] . "')",
         "addPerishableConsumableSuccess");
 
     OCICommit($db_conn);
@@ -998,29 +1032,32 @@ function handleAddPerishableConsumable() {
        OCICommit($db_conn);
     }
 
-	function printTable($result, $headers, $altHeaders, $elem) {
-		$tableString = "<table><tr>";
-		if($altHeaders != null) {
-			foreach($altHeaders as &$header) {
-				$tableString .= "<th>" . $header . "</th>";
-			}
-		}else {
-			foreach($headers as &$header) {
-				$tableString .= "<th>" . $header . "</th>";
-			}
-		}
-		$tableString .= "</tr>";
+	function printTable($result, $headers, $altHeaders, $elem)
+    {
+        $tableString = "<table><tr>";
+        if ($altHeaders != null) {
+            foreach ($altHeaders as &$header) {
+                $tableString .= "<th>" . $header . "</th>";
+            }
+        } else {
+            foreach ($headers as &$header) {
+                $tableString .= "<th>" . $header . "</th>";
+            }
+        }
+        $tableString .= "</tr>";
 
-		while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			$tableString .= "<tr>";
-			foreach($headers as &$header) {
-				$tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
-			}
-			$tableString .= "</tr>";
-		}
-		$tableString .= "</table>";
-		callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
-	}
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+            foreach ($headers as &$header) {
+                $tableString .= "<td>" . $row[strtoupper($header)] . "</td>";
+            }
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
+            }
+
+
 	function handleDisplayTable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
@@ -1136,7 +1173,7 @@ function handleAddPerishableConsumable() {
 
     function handleGetBusinessesWithCapacityBetweenXAndY() {
 	    $result = executeSQL("SELECT * FROM Business
-                WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
+                WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_POST["y"] . "'",
             "getBusinessesWithCapacityBetweenXAndYSuccess");
         $headers = ["name", "address", "capacity"];
         $altHeaders = null;
@@ -1154,11 +1191,58 @@ function handleAddPerishableConsumable() {
 
     function handleGetCustomersWhoVisitedBusiness() {
 	    $result = executeSQL("SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
-CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_POST["business"] ."'", "getCustomersWhoVisitedBusinessSuccess");
+CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'", "getCustomersWhoVisitedBusinessSuccess");
 	    $headers = ["name", "pNumber"];
 	    $altHeaders = null;
         printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedBusinessTable");
 
+    }
+
+    function handleGetVisitsBypNumber() {
+	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
+        $tableString = "<table><tr>";
+        $elem = "getVisitsBypNumberTable";
+        $tableString .= "<th>" . "Number of Visits" . "</th>";
+        $tableString .= "<th>" . "pNumber" . "</th>";
+        $tableString .= "</tr>";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+                $tableString .= "<td>" . $row[0] . "</td>";
+            $tableString .= "<td>" . $row[1] . "</td>";
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
+    }
+
+    function handleGetBusinessesVisitedByCustomer() {
+	    $pNumber = $_POST["customer"];
+	    $result = executeSQL("SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
+           VisitedTime.bid = Business.bid AND VisitedTime.pNumber = '". $_POST["customer"] . "'", "getBusinessesVisitedByCustomerSuccess");
+	    $headers = ["name", "capacity", "address"];
+	    $altHeaders = null;
+	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
+    }
+
+    function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
+	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
+ RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
+>'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
+        $tableString = "<table><tr>";
+        $elem = "getTransactionsGroupedByBusinessWithTotalAboveXTable";
+        $tableString .= "<th>" . "Total Amount" . "</th>";
+        $tableString .= "<th>" . "business name" . "</th>";
+        $tableString .= "<th>" . "business address" . "</th>";
+        $tableString .= "</tr>";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+            $tableString .= "<td>" . $row[0] . "</td>";
+            $tableString .= "<td>" . $row[1] . "</td>";
+            $tableString .= "<td>" . $row[2] . "</td>";
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
 
@@ -1223,6 +1307,12 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
                 handleGetCustomersWhoVisitedAllBusinesses();
             } else if (array_key_exists("getCustomersWhoVisitedBusiness", $_POST)) {
                 handleGetCustomersWhoVisitedBusiness();
+            } else if (array_key_exists("getVisitsBypNumber", $_POST)) {
+                handleGetVisitsBypNumber();
+            } else if (array_key_exists("getBusinessesVisitedByCustomer", $_POST)) {
+                handleGetBusinessesVisitedByCustomer();
+            } else if (array_key_exists("getTransactionsGroupedByBusinessWithTotalAboveX", $_POST)) {
+                handleGetTransactionsGroupedByBusinessWithTotalAboveX();
             }
             disconnectDB();
         }
