@@ -281,15 +281,6 @@
                             <p>Business: </p>
                             <select class="businessSelect" name="business">
                             </select>
-
-
-
-
-
-
-
-
-
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
                     </form>
@@ -568,16 +559,29 @@
             </div>
 
             <div class=op-container">
-                <h2>Get Businesses Visited By Customer</h2>
+                <h2>Get Transactions grouped by business with totals over X</h2>
                 <form method="POST" action ="index.php">
                     <p>Customer: </p>
-                    <select class="customerSelect" name="customer">
-                    </select>
+                    <input type="number" name="x">
                     <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
                 </form>
                 <div id ="getBusinessesVisitedByCustomerSuccess"></div>
                 <div id ="getBusinessesVisitedByCustomerTable"></div>
         </div>
+
+            <div class=op-container">
+                <h2>Get Businesses Visited By Customer</h2>
+                <form method="POST" action ="index.php">
+                    <p>X: </p>
+                    <select class="customerSelect" name="customer">
+                    </select>
+                    <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
+                </form>
+                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
+                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
+            </div>
+
+
 
 		</div>
 	</body>
@@ -1141,11 +1145,33 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
     }
 
     function handleGetBusinessesVisitedByCustomer() {
-	    $result = executeSQL("SELECT name, address, capacity FROM Business, VisitedTime WHERE
-           VisitedTime.bid = Business.bid AND VisitedTime.pNumber ='" . $_POST["customer"] ."'", "getBusinessesVisitedByCustomerSuccess");
-	    $headers = ["name", "address", "capacity"];
+	    $pNumber = $_POST["CUSTOMER"];
+	    $result = executeSQL("SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
+           VisitedTime.bid = Business.bid AND VisitedTime.pNumber ='". $pNumber ."'", "getBusinessesVisitedByCustomerSuccess");
+	    $headers = ["name", "capacity", "address"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
+    }
+
+    function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
+	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
+ RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
+>'". $_POST["X"] . "'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
+        $tableString = "<table><tr>";
+        $elem = "getTransactionsGroupedByBusinessWithTotalAboveXTable";
+        $tableString .= "<th>" . "Total Amount" . "</th>";
+        $tableString .= "<th>" . "business name" . "</th>";
+        $tableString .= "<th>" . "business address" . "</th>";
+        $tableString .= "</tr>";
+        while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $tableString .= "<tr>";
+            $tableString .= "<td>" . $row[0] . "</td>";
+            $tableString .= "<td>" . $row[1] . "</td>";
+            $tableString .= "<td>" . $row[2] . "</td>";
+            $tableString .= "</tr>";
+        }
+        $tableString .= "</table>";
+        callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
 
@@ -1212,6 +1238,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
                 handleGetVisitsBypNumber();
             } else if (array_key_exists("getBusinessesVisitedByCustomer", $_POST)) {
                 handleGetBusinessesVisitedByCustomer();
+            } else if (array_key_exists("getTransactionsGroupedByBusinessWithTotalAboveX", $_POST)) {
+                handleGetTransactionsGroupedByBusinessWithTotalAboveX();
             }
             disconnectDB();
         }
