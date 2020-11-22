@@ -561,7 +561,7 @@
             <div class=op-container">
                 <h2>Get Transactions grouped by business with totals over X</h2>
                 <form method="POST" action ="index.php">
-                    <p>Customer: </p>
+                    <p>x: </p>
                     <input type="number" name="x">
                     <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
                 </form>
@@ -572,7 +572,7 @@
             <div class=op-container">
                 <h2>Get Businesses Visited By Customer</h2>
                 <form method="POST" action ="index.php">
-                    <p>X: </p>
+                    <p>customer: </p>
                     <select class="customerSelect" name="customer">
                     </select>
                     <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
@@ -1102,7 +1102,7 @@ function handleAddPerishableConsumable() {
 
     function handleGetBusinessesWithCapacityBetweenXAndY() {
 	    $result = executeSQL("SELECT * FROM Business
-                WHERE Business.capacity>='" . $_POST["x"] . "'AND  Business.capacity<='". $_POST["y"] . "'",
+                WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_POST["y"] . "'",
             "getBusinessesWithCapacityBetweenXAndYSuccess");
         $headers = ["name", "address", "capacity"];
         $altHeaders = null;
@@ -1120,7 +1120,7 @@ function handleAddPerishableConsumable() {
 
     function handleGetCustomersWhoVisitedBusiness() {
 	    $result = executeSQL("SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
-CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_POST["business"] ."'", "getCustomersWhoVisitedBusinessSuccess");
+CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'", "getCustomersWhoVisitedBusinessSuccess");
 	    $headers = ["name", "pNumber"];
 	    $altHeaders = null;
         printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedBusinessTable");
@@ -1145,9 +1145,9 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
     }
 
     function handleGetBusinessesVisitedByCustomer() {
-	    $pNumber = $_POST["CUSTOMER"];
+	    $pNumber = $_POST["customer"];
 	    $result = executeSQL("SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
-           VisitedTime.bid = Business.bid AND VisitedTime.pNumber ='". $pNumber ."'", "getBusinessesVisitedByCustomerSuccess");
+           VisitedTime.bid = Business.bid AND VisitedTime.pNumber = '". $_POST["customer"] . "'", "getBusinessesVisitedByCustomerSuccess");
 	    $headers = ["name", "capacity", "address"];
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
@@ -1156,7 +1156,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
  RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
->'". $_POST["X"] . "'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
+>'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
         $tableString = "<table><tr>";
         $elem = "getTransactionsGroupedByBusinessWithTotalAboveXTable";
         $tableString .= "<th>" . "Total Amount" . "</th>";
