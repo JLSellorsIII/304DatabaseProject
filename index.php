@@ -281,6 +281,15 @@
                             <p>Business: </p>
                             <select class="businessSelect" name="business">
                             </select>
+
+
+
+
+
+
+
+
+
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
                     </form>
@@ -558,6 +567,18 @@
                 <div id="getVisitsBypNumberTable"></div>
             </div>
 
+            <div class=op-container">
+                <h2>Get Businesses Visited By Customer</h2>
+                <form method="POST" action ="index.php">
+                    <p>Customer: </p>
+                    <select class="customerSelect" name="customer">
+                    </select>
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
+                </form>
+                <div id ="getBusinessesVisitedByCustomerSuccess"></div>
+                <div id ="getBusinessesVisitedByCustomerTable"></div>
+        </div>
+
 		</div>
 	</body>
 
@@ -709,7 +730,7 @@
 
 		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
                               . $_POST['shiftID'] . "', '"
-                              . $_POST['bid'] . "', '"
+                              . $_POST['business'] . "', '"
                               . $_POST['email'] . "', '"
                               . $_POST['Wage'] . ", "
                               . $startTime . ", "
@@ -748,7 +769,7 @@
         $transactionDate = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
 	    $result = executeSQL("INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('" .
-            $_POST['tid'] . "', '" . $_POST['bid'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
+            $_POST['tid'] . "', '" . $_POST['business'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
             "addTransactionSuccess");
 
 	    OCICommit($db_conn);
@@ -758,7 +779,7 @@
         global $db_conn;
 
         $result = executeSQL("INSERT INTO CovidSupplies(quantity, csid, bid) VALUES ('" .
-            $_POST['quantity'] . "', '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+            $_POST['quantity'] . "', '" . $_POST['csid'] . "', '" . $_POST['business'] . "')",
             "addCovidSuppliesSuccess");
 
         OCICommit($db_conn);
@@ -768,7 +789,7 @@ function handleAddNonPerishableConsumable() {
     global $db_conn;
 
     $result = executeSQL("INSERT INTO CovidSupplies(cid, bid) VALUES (
- '" . $_POST['csid'] . "', '" . $_POST['bid'] . "')",
+ '" . $_POST['csid'] . "', '" . $_POST['business'] . "')",
         "addNonPerishableConsumableSuccess");
 
     OCICommit($db_conn);
@@ -778,7 +799,7 @@ function handleAddPerishableConsumable() {
     global $db_conn;
 
     $result = executeSQL("INSERT INTO PerishableConsumable(expirationDate, cid, bid) VALUES ('" .
-        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['bid'] . "')",
+        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['business'] . "')",
         "addPerishableConsumableSuccess");
 
     OCICommit($db_conn);
@@ -1106,7 +1127,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
 	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
         $tableString = "<table><tr>";
         $elem = "getVisitsBypNumberTable";
-        $tableString .= "<th>" . "count" . "</th>";
+        $tableString .= "<th>" . "Number of Visits" . "</th>";
         $tableString .= "<th>" . "pNumber" . "</th>";
         $tableString .= "</tr>";
         while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -1117,6 +1138,14 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
         }
         $tableString .= "</table>";
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
+    }
+
+    function handleGetBusinessesVisitedByCustomer() {
+	    $result = executeSQL("SELECT name, address, capacity FROM Business, VisitedTime WHERE
+           VisitedTime.bid = Business.bid AND VisitedTime.pNumber ='" . $_POST["customer"] ."'", "getBusinessesVisitedByCustomerSuccess");
+	    $headers = ["name", "address", "capacity"];
+	    $altHeaders = null;
+	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
     }
 
 
@@ -1181,6 +1210,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '". $_P
                 handleGetCustomersWhoVisitedBusiness();
             } else if (array_key_exists("getVisitsBypNumber", $_POST)) {
                 handleGetVisitsBypNumber();
+            } else if (array_key_exists("getBusinessesVisitedByCustomer", $_POST)) {
+                handleGetBusinessesVisitedByCustomer();
             }
             disconnectDB();
         }
