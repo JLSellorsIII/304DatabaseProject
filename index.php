@@ -244,6 +244,32 @@
                     </form>
                     <div id="addAccountSuccess"/>
                 </div>
+				
+				<div class="op-container">
+                    <h2>Add Write Permission to Account</h2>
+                    <form method="POST" action="index.php">
+                        <div>
+                            <p>Email Address: </p>
+                            <select class="accountSelect" name="account">
+							</select>
+                        </div>
+                        <div>
+                            <p>Business: </p>
+                            <select class="businessSelect" name="business">
+							</select>
+                        </div>
+						<div>
+                            <p>Write Permission: </p>
+                            <select id="permission" name="permission">
+								<option value=null>N/A</option>
+								<option value=1>Yes</option>
+								<option value=0>No</option>
+							</select>
+                        </div>
+                        <input class="submit button" type="submit" value="Add" name="addAccess">
+                    </form>
+                    <div id="addAccessSuccess"/>
+                </div>
 
                 <div class="op-container">
                     <h2>Add Covid Supplies</h2>
@@ -494,6 +520,7 @@
 							<option value="account">Account</option>
 							<option value="tracksDate">TracksDate</option>
 							<option value="tracksPaid">TracksPaid</option>
+							<option value="accesses">Accesses</option>
 						</select>
 					<input type="submit" class="button" value="Get" name="displayTable">
 				</form>
@@ -729,17 +756,28 @@
 	function handleAddShift() {
 		global $db_conn;
 
-        $startTime = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
-        $endTime = date("Y-m-d H:i:s", strtotime($_POST['endTime']));
+        $startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
+        $endTime = date("d.m.Y:H:i:s", strtotime($_POST['endTime']));
+        $duration = (strtotime($endTime) - strtoTime($startTime))/3600;
 
-		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ('"
-                              . $_POST['shiftID'] . "', '"
-                              . $_POST['business'] . "', '"
-                              . $_POST['email'] . "', '"
-                              . $_POST['Wage'] . ", "
-                              . $startTime . ", "
-                              . $endTime . "')", "addShiftSuccess");
-		$result = executeSQL("INSERT INTO ScheduledTime(shiftID,startTime,endTime,duration)","addShiftSuccess");
+        $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
+                                FROM ScheduledTime
+                                WHERE startTime='" . $startTime . "'
+                                AND endTime='" . $endTime
+                                . "')", null), OCI_NUM);
+        if(count($timeArray) < 2) {
+            $result = executeSQL("INSERT INTO ScheduledTime(startTime,endTime,duration)
+            VALUES (TO_DATE('" . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), TO_DATE('"
+                                 . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'), " . $duration . ")","addShiftSuccess");
+        }
+
+		$result  = executeSQL("INSERT INTO ScheduledShift(shiftID, bid, email, Wage, startTime, endTime) VALUES ("
+                              . $_POST['shiftID'] . ", "
+                              . $_POST['business'] . ", '"
+                              . $_POST['account'] . "', "
+                              . $_POST['Wage'] . ", TO_DATE('"
+                              . $startTime . "', 'DD.MM.YYYY:HH24:MI:SS'), TO_DATE('"
+                              . $endTime . "', 'DD.MM.YYYY:HH24:MI:SS'))", "addShiftSuccess");
 		OCICommit($db_conn);
 	}
 
@@ -822,14 +860,13 @@ function handleAddPerishableConsumable() {
 
 	function handleAddVisitor() {
 		global $db_conn;
-		$endTime = $_POST['startTime'] + $_POST['duration'];
 		$startTime = date("d.m.Y:H:i:s", strtotime($_POST['startTime']));
 		$endTime = date("d.m.Y:H:i:s",
 						(strtotime($_POST['startTime']) + $_POST["duration"] * 3600));
         $timeArray = OCI_Fetch_Array(executeSQL("SELECT *
                                 FROM VisitedLength
                                 WHERE VisitedLength.arrivalTime='" . $startTime . "'
-                                AND VisitedLength.duration='" . $$_POST["duration"]
+                                AND VisitedLength.duration='" . $_POST["duration"]
                                 . "'", null), OCI_NUM);
         if(count($timeArray) < 2) {
             executeSQL("INSERT INTO VisitedLength(arrivalTime, Duration, endTime)
@@ -873,6 +910,15 @@ function handleAddPerishableConsumable() {
                    . $_POST['paid'] . ")", "addTracksSuccess");
         OCICommit($db_conn);
     }
+	
+	function handleAddAccess() {
+        global $db_conn;
+        executeSQL("INSERT INTO Accesses(email, bid, writePermission)
+                    VALUES ('" . $_POST['account'] . "', 
+                   ". "'" . $_POST['business'] . "', 
+                   ". $_POST['permission'] . ")", "addAccessSuccess");
+        OCICommit($db_conn);
+    }
 
     function handleDeleteFine() {
         global $db_conn;
@@ -894,7 +940,7 @@ function handleAddPerishableConsumable() {
 		
 	function handleDeleteAccount() {
         global $db_conn;
-        executeSQL("DELETE FROM Account WHERE email='" . $_POST['email'] . "'",
+        executeSQL("DELETE FROM Account WHERE email='". $_POST['account'] . "'",
                 "deleteAccountSuccess");
         OCICommit($db_conn);
     }
@@ -961,10 +1007,29 @@ function handleAddPerishableConsumable() {
 	
 	function handleUpdateAccountEmail() {
         global $db_conn;
+		/*
+		if(executeSQL(SELECT 1 FROM Accesses WHERE "'" . $_POST['account'] . "' IN email") == 1) {
+			*/
+			executeSQL("UPDATE Accesses
+                    SET email='" . $_POST['newEmail'] . "'
+                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//} else if("SELECT * FROM ScheduledShift WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE ScheduledShift
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");	
+		//} else if("SELECT * FROM TracksDate WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE TracksDate
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//} else if("SELECT * FROM TracksPaid WHERE email='" . $_POST['account'] . "'") {
+			executeSQL("UPDATE TracksPaid
+						SET email='" . $_POST['newEmail'] . "'
+						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+		//}
         executeSQL("UPDATE Account
                     SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['email'] . "'", "updateAccountEmailSuccess");
-        OCICommit($db_conn);
+                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
+       OCICommit($db_conn);
     }
 
 	function printTable($result, $headers, $altHeaders, $elem)
@@ -1072,6 +1137,12 @@ function handleAddPerishableConsumable() {
 				$result = executeSQL("SELECT * FROM Account", "displayTableSuccess");
 				$headers = ["email", "password"];
 				$altHeaders = ["Email Address", "Password"];
+				printTable($result, $headers, $altHeaders, "mainTable");
+				break;
+			case "accesses":
+				$result = executeSQL("SELECT * FROM Accesses", "displayTableSuccess");
+				$headers = ["email", "bid", "writePermission"];
+				$altHeaders = ["Email Address", "Business ID", "Write Permission"];
 				printTable($result, $headers, $altHeaders, "mainTable");
 				break;
             case "tracksDate":
@@ -1202,6 +1273,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
                 handleAddPerishableConsumable();
             } else if (array_key_exists("addAccount", $_POST)) {
 				handleAddAccount();
+			} else if (array_key_exists("addAccess", $_POST)) {
+				handleAddAccess();
 			} else if (array_key_exists("addTracks", $_POST)) {
 				handleAddTracks();
 			} else if (array_key_exists("deleteFine", $_POST)) {
