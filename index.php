@@ -1181,9 +1181,14 @@ function handleAddPerishableConsumable() {
     }
 
     function handleGetCustomersWhoVisitedAllBusinesses() {
-	    $result = executeSQL("SELECT name FROM VisitedTime, CustomerPartyContact WHERE
-            VisitedTime.pNumber = CustomerPartyContact.pNumber AND NOT EXISTS((SELECT bid FROM Business as b) 
-            EXCEPT (SELECT bid FROM VisitedTime WHERE VisitedTime.bid = b.bid))" ,"getCustomersWhoVisitedAllBusinessesSuccess");
+	    $result = executeSQL("select distinct name from CustomerPartyContact cpc
+where not exists (
+            select * from Business b
+    where not exists (
+            select * from VisitedTime vt
+        where vt.bid = b.bid and  vt.pNumber = cpc.pNumber
+    )
+   )" ,"getCustomersWhoVisitedAllBusinessesSuccess");
         $headers = ["name"];
         $altHeaders = null;
         printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedAllBusinessesTable");
@@ -1199,7 +1204,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
     }
 
     function handleGetVisitsBypNumber() {
-	    $result = executeSQL("SELECT count(*) pNumber, pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
+	    $result = executeSQL("SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
         $tableString = "<table><tr>";
         $elem = "getVisitsBypNumberTable";
         $tableString .= "<th>" . "Number of Visits" . "</th>";
@@ -1223,6 +1228,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
     }
+    
 
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
