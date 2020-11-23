@@ -504,6 +504,7 @@
 				<h2>Display the Tuples in Selected Table</h2>
 				<form method="POST" action="index.php">
 					<input type="hidden" id="displayTable" name="displaySelectedTable">
+                    <div>
 						<select id="tableSelect" name="table">
 							<option value="scheduledShift">ScheduledShift</option>
 							<option value="customerPartyContact">CustomerPartyContact</option>
@@ -522,7 +523,8 @@
 							<option value="tracksPaid">TracksPaid</option>
 							<option value="accesses">Accesses</option>
 						</select>
-					<input type="submit" class="button" value="Get" name="displayTable">
+                    </div>
+					<input type="submit" class="submit button" value="Get" name="displayTable">
 				</form>
 				<div id="displayTableSuccess"></div>
 				<div id="mainTable"></div>
@@ -542,9 +544,11 @@
             <div class="op-container">
                 <h2>Get All Customers who Visited Business</h2>
                 <form method="POST" action="index.php">
-                    <p>Business: </p>
-                    <select class="businessSelect" name="business">
-                    </select>
+                    <div>
+                        <p>Business: </p>
+                        <select class="businessSelect" name="business">
+                        </select>
+                    </div>
                     <input type="submit" class="submit button" value="Get" name="getCustomersWhoVisitedBusiness">
                 </form>
                 <div id="getCustomersWhoVisitedBusinessSuccess"></div>
@@ -585,23 +589,27 @@
                 <div id="getVisitsBypNumberTable"></div>
             </div>
 
-            <div class=op-container">
+            <div class="op-container">
                 <h2>Get Transactions grouped by business with totals over X</h2>
                 <form method="POST" action ="index.php">
-                    <p>x: </p>
-                    <input type="number" name="x">
+                    <div>
+                        <p>X: </p>
+                        <input type="number" name="x">
+                    </div>
                     <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
                 </form>
                 <div id ="getBusinessesVisitedByCustomerSuccess"></div>
                 <div id ="getBusinessesVisitedByCustomerTable"></div>
         </div>
 
-            <div class=op-container">
+            <div class="op-container">
                 <h2>Get Businesses Visited By Customer</h2>
                 <form method="POST" action ="index.php">
-                    <p>customer: </p>
-                    <select class="customerSelect" name="customer">
-                    </select>
+                    <div>
+                        <p>customer: </p>
+                        <select class="customerSelect" name="customer">
+                        </select>
+                    </div>
                     <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
                 </form>
                 <div id =" getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
