@@ -596,10 +596,10 @@
                         <p>X: </p>
                         <input type="number" name="x">
                     </div>
-                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
+                    <input type="submit" class="submit button" value="Get" name="getTransactionsGroupedByBusinessWithTotalAboveX">
                 </form>
-                <div id ="getBusinessesVisitedByCustomerSuccess"></div>
-                <div id ="getBusinessesVisitedByCustomerTable"></div>
+                <div id="getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
+                <div id="getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
         </div>
 
             <div class="op-container">
@@ -610,10 +610,10 @@
                         <select class="customerSelect" name="customer">
                         </select>
                     </div>
-                    <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
                 </form>
-                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
-                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
+                <div id="getBusinessesVisitedByCustomerSuccess"></div>
+                <div id="getBusinessesVisitedByCustomerTable"></div>
             </div>
 
 
@@ -1063,7 +1063,7 @@ function handleAddPerishableConsumable() {
         }
         $tableString .= "</table>";
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
-            }
+    }
 
 
 	function handleDisplayTable() {
@@ -1212,7 +1212,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
     }
 
     function handleGetVisitsBypNumber() {
-	    $result = executeSQL("SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
+	    $result = executeSQL("SELECT count(*), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsBypNumberSuccess");
         $tableString = "<table><tr>";
         $elem = "getVisitsBypNumberTable";
         $tableString .= "<th>" . "Number of Visits" . "</th>";
@@ -1240,8 +1240,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
- RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
->'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
+                            RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
+                            >'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
         $tableString = "<table><tr>";
         $elem = "getTransactionsGroupedByBusinessWithTotalAboveXTable";
         $tableString .= "<th>" . "Total Amount" . "</th>";
