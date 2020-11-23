@@ -1373,7 +1373,7 @@ function fillShiftSelect() {
         $optionString = "";
         while($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             $optionString .= "<option value='" . $row["SHIFTID"] . "'>" .
-                $row["ACCOUNT"] . " - " . $row["BUSINESS"] . " - " . $row["STARTTIME"] . "</option>";
+                $row["EMAIL"] . " - " . $row["BID"] . " - " . $row["STARTTIME"] . "</option>";
         }
         callJSFunc("printToElements('shiftSelect', `" . $optionString . "`)");
     }
