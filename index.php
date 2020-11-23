@@ -585,6 +585,14 @@
                 <div id="getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
                 <div id="getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
         </div>
+            <div class="op-container">
+                <h2>Get the business with the highest average transactions</h2>
+                <form method="GET" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getHighestAvgTransactions">
+                </form>
+                <div id="getHighestAvgTransactionsSuccess"></div>
+                <div id="getHighestAvgTransactionsTable"></div>
+            </div>
 
             <div class="op-container">
                 <h2>Get Businesses Visited By Customer</h2>
@@ -1216,6 +1224,17 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
+    function handleGetHighestAvgTransactions() {
+        $result = executeSQL(" SELECT bid, AVG(amount)
+                                FROM RecordedTransaction
+                                GROUP BY bid
+                                HAVING avg(amount) >= ALL (SELECT avg(RT2.amount)
+                                            FROM RecordedTransaction RT2
+                                            GROUP BY RT2.bid)", "getHighestAvgTransactionsSuccess");
+        $headers = ["bid", "avg(amount)"];
+        $altHeaders = ["Business ID", "Average Amount"];
+        printTable($result, $headers, $altHeaders, "getHighestAvgTransactionsTable");
+    }
 
 	function handlePOSTRequest()
     {
@@ -1293,6 +1312,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 				initTables();
 			} else if (array_key_exists('populateTables', $_GET)) {
 			    populateTables();
+            } else if (array_key_exists('getHighestAvgTransactions', $_GET)) {
+                handleGetHighestAvgTransactions();
             }
 			disconnectDB();
 		}
