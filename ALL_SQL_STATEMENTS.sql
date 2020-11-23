@@ -60,3 +60,41 @@ DELETE FROM Account WHERE email='bob@uncle.com';
 DELETE FROM Business WHERE bid=1;
 
 DELETE FROM ScheduledShift WHERE shiftID='4';
+
+
+-- Queries
+
+--CovidSuppliesBelowX query
+SELECT * FROM CovidSupplies
+                            WHERE CovidSupplies.quantity<'"
+                            . $_POST["x"] . "'
+
+-- Businesses With Capacity Between x and y query, satisfies selection requirement
+SELECT * FROM Business
+WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_POST["y"] . "'
+
+-- Get Customers who visited all business query, satisfies division requirement
+select distinct name from CustomerPartyContact cpc
+where not exists (
+        select * from Business b
+        where not exists (
+                select * from VisitedTime vt
+                where vt.bid = b.bid and  vt.pNumber = cpc.pNumber
+            )
+    )
+
+-- get Customers who visited Business query, satisfies join requirement
+SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
+        CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'
+
+--get number of visits per pnumber, satisfies aggregation requirement
+SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber
+
+--get business name address and capacity of businesses visited by customer, satisfies projection requirement
+SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
+        VisitedTime.bid = Business.bid AND VisitedTime.pNumber = '". $_POST["customer"] . "'
+
+--get names and addresses of businesses with total transaction amount higher than x, satisfies aggregation with group by requirement
+SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
+                                             RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
+                                                                                      >'". $_POST["x"] ."'
