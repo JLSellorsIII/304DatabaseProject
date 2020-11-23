@@ -221,8 +221,8 @@
                             <input type="text" name="amount">
                         </div>
                         <div>
-                            <p>date:</p>
-                            <input type="datetime-local" name="date">
+                            <p>date(dd.mmm.yyyy) :</p>
+                            <input type="text" name="date">
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addTransaction">
                     </form>
@@ -296,7 +296,7 @@
                     <h2>Add Perishable Consumable</h2>
                     <form method="POST" action="index.php">
                         <div>
-                            <p>Expiration Date (dd.mmm.yyyy:hh:mm:ss):</p>
+                            <p>Expiration Date (dd.mmm.yyyy):</p>
                             <input type="text" name="expirationDate">
                         </div>
                         <div>
@@ -310,7 +310,7 @@
                         </div>
                         <input class="submit button" type="submit" value="Add" name="addPerishableConsumable">
                     </form>
-                    <div id="addPerishableSuppliesSuccess"/>
+                    <div id="addPerishableConsumableSuccess"/>
                 </div>
 
             <div class="op-container">
@@ -327,7 +327,7 @@
                     </div>
                     <input class="submit button" type="submit" value="Add" name="addNonPerishableConsumable">
                 </form>
-                <div id="addNonPerishableSuppliesSuccess"/>
+                <div id="addNonPerishableConsumableSuccess"/>
             </div>
 
 		</div>
@@ -811,7 +811,7 @@
         $transactionDate = date("Y-m-d H:i:s", strtotime($_POST['startTime']));
 
 	    $result = executeSQL("INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('" .
-            $_POST['tid'] . "', '" . $_POST['business'] . "', '" . $_POST['amount'] . "', '" . $transactionDate .  "')",
+            $_POST['tid'] . "', '" . $_POST['business'] . "', '" . $_POST['amount'] . "', '" . $_POST["date"] .  "')",
             "addTransactionSuccess");
 
 	    OCICommit($db_conn);
@@ -830,8 +830,8 @@
 function handleAddNonPerishableConsumable() {
     global $db_conn;
 
-    $result = executeSQL("INSERT INTO CovidSupplies(cid, bid) VALUES (
- '" . $_POST['csid'] . "', '" . $_POST['business'] . "')",
+    $result = executeSQL("INSERT INTO NonPerishableConsumables(cid, bid) VALUES (
+ '" . $_POST['cid'] . "', '" . $_POST['business'] . "')",
         "addNonPerishableConsumableSuccess");
 
     OCICommit($db_conn);
@@ -840,8 +840,8 @@ function handleAddNonPerishableConsumable() {
 function handleAddPerishableConsumable() {
     global $db_conn;
 
-    $result = executeSQL("INSERT INTO PerishableConsumable(expirationDate, cid, bid) VALUES ('" .
-        $_POST['expirationDate'] . "', '" . $_POST['cid'] . "', '" . $_POST['business'] . "')",
+    $result = executeSQL("INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES ('" .
+        $_POST["expirationDate"] . "', '" . $_POST["cid"] . "', '" . $_POST["business"] . "')",
         "addPerishableConsumableSuccess");
 
     OCICommit($db_conn);
