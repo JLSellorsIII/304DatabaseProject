@@ -27,13 +27,36 @@ INSERT INTO TracksPaid(bid, email, law, paid) VALUES (1, 'bart@simpson.com', 'Ov
 
 INSERT INTO Business(url, name, capacity, bid, address) VALUES ('business.example.com ', 'Business', '35', '45', '123 business st');
 
--- TODO: Needs to be fixed (null values);
--- INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('1234', '', '300', '1970-01-01 00:00:00');
+INSERT INTO RecordedTransaction(tid, bid, amount, transactionDate) VALUES ('1234', '1', '300', '12.aug.2020');
 
 INSERT INTO Account(email, password) VALUES ('test@email.com', 'password');
 
--- TODO: Fix addCovidSupplies
+INSERT INTO CovidSupplies(quantity, csid, bid) VALUES ('200', '32', '1');
 
--- TODO: Fix NonPerishable
---
--- TODO: Fix Perishable
+INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES ('11.aug.2020', '2', '1');
+
+INSERT INTO NonPerishableConsumables(cid, bid) VALUES ( '23', '1');
+
+UPDATE TracksPaid SET paid=1 WHERE bid='4' AND email='bob@uncle.com' AND law='Divider';
+
+UPDATE Fine SET amount=5000 WHERE law='Overcapacity';
+
+UPDATE Warning SET severity=2 WHERE law='Cash';
+
+UPDATE Violation SET description='new description' WHERE law='Overcapacity';
+
+UPDATE Business SET address='1234 new st' WHERE bid=2;
+
+--TODO: FIX updateAccountEmail
+
+DELETE FROM Fine WHERE law='Overcapacity';
+DELETE FROM Violation WHERE law='Overcapacity';
+
+DELETE FROM Warning WHERE law='Cash';
+DELETE FROM Violation WHERE law='Cash';
+
+DELETE FROM Account WHERE email='bob@uncle.com';
+
+DELETE FROM Business WHERE bid=1;
+
+DELETE FROM ScheduledShift WHERE shiftID='4';
