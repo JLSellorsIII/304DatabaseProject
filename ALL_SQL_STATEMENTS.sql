@@ -47,8 +47,6 @@ UPDATE Violation SET description='new description' WHERE law='Overcapacity';
 
 UPDATE Business SET address='1234 new st' WHERE bid=2;
 
---TODO: FIX updateAccountEmail
-
 DELETE FROM Fine WHERE law='Overcapacity';
 DELETE FROM Violation WHERE law='Overcapacity';
 

@@ -416,22 +416,6 @@
 				</form>
 				<div id="updateBusinessAddressSuccess"></div>
             </div>
-			<div class="op-container">
-				<h2>Update Account Email</h2>
-				<form method="POST" action="index.php">
-					<div>
-						<p>Account: </p>
-						<select class="accountSelect" name="account">
-                        </select>
-					</div>
-                    <div>
-                        <p>New Email: </p>
-                        <input type="text" name="newEmail" />
-                    </div>
-					<input type="submit" class="submit button" value="Update" name="updateAccountEmail">
-				</form>
-				<div id="updateAccountEmailSuccess"></div>
-            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -1013,33 +997,6 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 	
-	function handleUpdateAccountEmail() {
-        global $db_conn;
-		/*
-		if(executeSQL(SELECT 1 FROM Accesses WHERE "'" . $_POST['account'] . "' IN email") == 1) {
-			*/
-			executeSQL("UPDATE Accesses
-                    SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//} else if("SELECT * FROM ScheduledShift WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE ScheduledShift
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");	
-		//} else if("SELECT * FROM TracksDate WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE TracksDate
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//} else if("SELECT * FROM TracksPaid WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE TracksPaid
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//}
-        executeSQL("UPDATE Account
-                    SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-       OCICommit($db_conn);
-    }
-
 	function printTable($result, $headers, $altHeaders, $elem)
     {
         $tableString = "<table><tr>";
@@ -1311,8 +1268,6 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 				handleUpdateViolationDesc();
 			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
 				handleUpdateBusinessAddress();
-			} else if (array_key_exists("updateAccountEmail", $_POST)) {
-				handleUpdateAccountEmail();
 			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
             } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
