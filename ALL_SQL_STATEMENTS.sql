@@ -47,8 +47,6 @@ UPDATE Violation SET description='new description' WHERE law='Overcapacity';
 
 UPDATE Business SET address='1234 new st' WHERE bid=2;
 
---TODO: FIX updateAccountEmail
-
 DELETE FROM Fine WHERE law='Overcapacity';
 DELETE FROM Violation WHERE law='Overcapacity';
 
@@ -98,3 +96,10 @@ SELECT Business.name, Business.address, Business.capacity FROM Business, Visited
 SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
                                              RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
                                                                                       >'". $_POST["x"] ."'
+SELECT bid, AVG(amount)
+FROM RecordedTransaction
+GROUP BY bid
+HAVING avg(amount) >=
+        ALL (SELECT avg(RT2.amount)
+                FROM RecordedTransaction RT2
+                GROUP BY RT2.bid)

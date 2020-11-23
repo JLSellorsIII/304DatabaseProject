@@ -416,22 +416,6 @@
 				</form>
 				<div id="updateBusinessAddressSuccess"></div>
             </div>
-			<div class="op-container">
-				<h2>Update Account Email</h2>
-				<form method="POST" action="index.php">
-					<div>
-						<p>Account: </p>
-						<select class="accountSelect" name="account">
-                        </select>
-					</div>
-                    <div>
-                        <p>New Email: </p>
-                        <input type="text" name="newEmail" />
-                    </div>
-					<input type="submit" class="submit button" value="Update" name="updateAccountEmail">
-				</form>
-				<div id="updateAccountEmailSuccess"></div>
-            </div>
 		</div>
 		<div id="deletes">
 			<h1>Deletes</h1>
@@ -504,6 +488,7 @@
 				<h2>Display the Tuples in Selected Table</h2>
 				<form method="POST" action="index.php">
 					<input type="hidden" id="displayTable" name="displaySelectedTable">
+                    <div>
 						<select id="tableSelect" name="table">
 							<option value="scheduledShift">ScheduledShift</option>
 							<option value="customerPartyContact">CustomerPartyContact</option>
@@ -522,7 +507,8 @@
 							<option value="tracksPaid">TracksPaid</option>
 							<option value="accesses">Accesses</option>
 						</select>
-					<input type="submit" class="button" value="Get" name="displayTable">
+                    </div>
+					<input type="submit" class="submit button" value="Get" name="displayTable">
 				</form>
 				<div id="displayTableSuccess"></div>
 				<div id="mainTable"></div>
@@ -542,9 +528,11 @@
             <div class="op-container">
                 <h2>Get All Customers who Visited Business</h2>
                 <form method="POST" action="index.php">
-                    <p>Business: </p>
-                    <select class="businessSelect" name="business">
-                    </select>
+                    <div>
+                        <p>Business: </p>
+                        <select class="businessSelect" name="business">
+                        </select>
+                    </div>
                     <input type="submit" class="submit button" value="Get" name="getCustomersWhoVisitedBusiness">
                 </form>
                 <div id="getCustomersWhoVisitedBusinessSuccess"></div>
@@ -585,27 +573,39 @@
                 <div id="getVisitsBypNumberTable"></div>
             </div>
 
-            <div class=op-container">
+            <div class="op-container">
                 <h2>Get Transactions grouped by business with totals over X</h2>
                 <form method="POST" action ="index.php">
-                    <p>x: </p>
-                    <input type="number" name="x">
-                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
+                    <div>
+                        <p>X: </p>
+                        <input type="number" name="x">
+                    </div>
+                    <input type="submit" class="submit button" value="Get" name="getTransactionsGroupedByBusinessWithTotalAboveX">
                 </form>
-                <div id ="getBusinessesVisitedByCustomerSuccess"></div>
-                <div id ="getBusinessesVisitedByCustomerTable"></div>
+                <div id="getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
+                <div id="getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
         </div>
+            <div class="op-container">
+                <h2>Get the business with the highest average transactions</h2>
+                <form method="GET" action="index.php">
+                    <input type="submit" class="submit button" value="Get" name="getHighestAvgTransactions">
+                </form>
+                <div id="getHighestAvgTransactionsSuccess"></div>
+                <div id="getHighestAvgTransactionsTable"></div>
+            </div>
 
-            <div class=op-container">
+            <div class="op-container">
                 <h2>Get Businesses Visited By Customer</h2>
                 <form method="POST" action ="index.php">
-                    <p>customer: </p>
-                    <select class="customerSelect" name="customer">
-                    </select>
-                    <input type="submit" class="submit button" value="Get" name=" getTransactionsGroupedByBusinessWithTotalAboveX">
+                    <div>
+                        <p>customer: </p>
+                        <select class="customerSelect" name="customer">
+                        </select>
+                    </div>
+                    <input type="submit" class="submit button" value="Get" name="getBusinessesVisitedByCustomer">
                 </form>
-                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXSuccess"></div>
-                <div id =" getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
+                <div id="getBusinessesVisitedByCustomerSuccess"></div>
+                <div id="getBusinessesVisitedByCustomerTable"></div>
             </div>
 
 
@@ -1005,33 +1005,6 @@ function handleAddPerishableConsumable() {
         OCICommit($db_conn);
     }
 	
-	function handleUpdateAccountEmail() {
-        global $db_conn;
-		/*
-		if(executeSQL(SELECT 1 FROM Accesses WHERE "'" . $_POST['account'] . "' IN email") == 1) {
-			*/
-			executeSQL("UPDATE Accesses
-                    SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//} else if("SELECT * FROM ScheduledShift WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE ScheduledShift
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");	
-		//} else if("SELECT * FROM TracksDate WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE TracksDate
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//} else if("SELECT * FROM TracksPaid WHERE email='" . $_POST['account'] . "'") {
-			executeSQL("UPDATE TracksPaid
-						SET email='" . $_POST['newEmail'] . "'
-						WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-		//}
-        executeSQL("UPDATE Account
-                    SET email='" . $_POST['newEmail'] . "'
-                    WHERE email='" . $_POST['account'] . "'", "updateAccountEmailSuccess");
-       OCICommit($db_conn);
-    }
-
 	function printTable($result, $headers, $altHeaders, $elem)
     {
         $tableString = "<table><tr>";
@@ -1055,7 +1028,7 @@ function handleAddPerishableConsumable() {
         }
         $tableString .= "</table>";
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
-            }
+    }
 
 
 	function handleDisplayTable() {
@@ -1204,7 +1177,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
     }
 
     function handleGetVisitsBypNumber() {
-	    $result = executeSQL("SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsbyPNumberSuccess");
+	    $result = executeSQL("SELECT count(*), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsBypNumberSuccess");
         $tableString = "<table><tr>";
         $elem = "getVisitsBypNumberTable";
         $tableString .= "<th>" . "Number of Visits" . "</th>";
@@ -1232,8 +1205,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
- RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
->'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
+                            RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
+                            >'". $_POST["x"] ."'", "getTransactionsGroupedByBusinessWithTotalAboveXSuccess");
         $tableString = "<table><tr>";
         $elem = "getTransactionsGroupedByBusinessWithTotalAboveXTable";
         $tableString .= "<th>" . "Total Amount" . "</th>";
@@ -1251,6 +1224,17 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
+    function handleGetHighestAvgTransactions() {
+        $result = executeSQL(" SELECT bid, AVG(amount)
+                                FROM RecordedTransaction
+                                GROUP BY bid
+                                HAVING avg(amount) >= ALL (SELECT avg(RT2.amount)
+                                            FROM RecordedTransaction RT2
+                                            GROUP BY RT2.bid)", "getHighestAvgTransactionsSuccess");
+        $headers = ["bid", "avg(amount)"];
+        $altHeaders = ["Business ID", "Average Amount"];
+        printTable($result, $headers, $altHeaders, "getHighestAvgTransactionsTable");
+    }
 
 	function handlePOSTRequest()
     {
@@ -1303,8 +1287,6 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 				handleUpdateViolationDesc();
 			} else if (array_key_exists("updateBusinessAddress", $_POST)) {
 				handleUpdateBusinessAddress();
-			} else if (array_key_exists("updateAccountEmail", $_POST)) {
-				handleUpdateAccountEmail();
 			} else if (array_key_exists("getCovidSuppliesBelowX", $_POST)) {
                 handleGetCovidSuppliesBelowX();
             } else if (array_key_exists("getBusinessesWithCapacityBetweenXAndY", $_POST)) {
@@ -1330,6 +1312,8 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 				initTables();
 			} else if (array_key_exists('populateTables', $_GET)) {
 			    populateTables();
+            } else if (array_key_exists('getHighestAvgTransactions', $_GET)) {
+                handleGetHighestAvgTransactions();
             }
 			disconnectDB();
 		}
