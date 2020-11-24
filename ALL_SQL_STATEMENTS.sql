@@ -1,3 +1,5 @@
+-- Insert: Example queries
+
 INSERT INTO customerPartyContact(pNumber, name) VALUES ('cNum', 'cName');
 
 -- First check if there is already a matching time entry
@@ -37,6 +39,7 @@ INSERT INTO PerishableConsumables(expirationDate, cid, bid) VALUES ('11.aug.2020
 
 INSERT INTO NonPerishableConsumables(cid, bid) VALUES ( '23', '1');
 
+-- Update: Example queries
 UPDATE TracksPaid SET paid=1 WHERE bid='4' AND email='bob@uncle.com' AND law='Divider';
 
 UPDATE Fine SET amount=5000 WHERE law='Overcapacity';
@@ -47,6 +50,7 @@ UPDATE Violation SET description='new description' WHERE law='Overcapacity';
 
 UPDATE Business SET address='1234 new st' WHERE bid=2;
 
+-- Delete: Example queries
 DELETE FROM Fine WHERE law='Overcapacity';
 DELETE FROM Violation WHERE law='Overcapacity';
 
@@ -60,42 +64,30 @@ DELETE FROM Business WHERE bid=1;
 DELETE FROM ScheduledShift WHERE shiftID='4';
 
 
--- Queries
-
---CovidSuppliesBelowX query
+-- Selection: Select covid supplies below an input quantity x.
 SELECT * FROM CovidSupplies
                             WHERE CovidSupplies.quantity<'"
                             . $_POST["x"] . "'
 
--- Businesses With Capacity Between x and y query, satisfies selection requirement
+-- Selection: Select businesses with capacity between inputs x and y.
 SELECT * FROM Business
 WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_POST["y"] . "'
 
--- Get Customers who visited all business query, satisfies division requirement
-select distinct name from CustomerPartyContact cpc
-where not exists (
-        select * from Business b
-        where not exists (
-                select * from VisitedTime vt
-                where vt.bid = b.bid and  vt.pNumber = cpc.pNumber
-            )
-    )
-
--- get Customers who visited Business query, satisfies join requirement
-SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
-        CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'
-
---get number of visits per pnumber, satisfies aggregation requirement
-SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber
-
---get business name address and capacity of businesses visited by customer, satisfies projection requirement
+-- Projection: List the name, address, and capacity of all businesses visited by a customer.
 SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
         VisitedTime.bid = Business.bid AND VisitedTime.pNumber = '". $_POST["customer"] . "'
 
---get names and addresses of businesses with total transaction amount higher than x, satisfies aggregation with group by requirement
+-- Join: List the names and phone numbers of customers who visited a business (joined by pNumber).
+SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
+        CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'
+
+-- Aggregation with Group By: Count the number of times a customer with a given phone number has visited a business.
+SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber
+
+-- Aggregation with Having: List the names and addresses of businesses with total transaction amounts higher than the input x.
 SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
-                                             RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
-                                                                                      >'". $_POST["x"] ."'
+		 RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount) >'". $_POST["x"] ."'
+																		-- Nested Aggregation: Return the ID of the business with the highest average transaction amounts.		  
 SELECT bid, AVG(amount)
 FROM RecordedTransaction
 GROUP BY bid
@@ -103,3 +95,13 @@ HAVING avg(amount) >=
         ALL (SELECT avg(RT2.amount)
                 FROM RecordedTransaction RT2
                 GROUP BY RT2.bid)
+				
+-- Division: List the name of customers who visited all businesses.
+select distinct name from CustomerPartyContact cpc
+where not exists (
+        select * from Business b
+        where not exists (
+                select * from VisitedTime vt
+                where vt.bid = b.bid and  vt.pNumber = cpc.pNumber
+            )
+    )			
