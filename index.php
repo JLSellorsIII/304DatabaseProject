@@ -680,6 +680,7 @@
 		OCILogoff($db_conn);
 	}
 
+	//executes given SQL statement in oracle, prints message relaying its success or failure
 	function executeSQL($sql, $successElement) {
 		global $db_conn, $success;
 
