@@ -77,17 +77,18 @@ WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_
 SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
         VisitedTime.bid = Business.bid AND VisitedTime.pNumber = '". $_POST["customer"] . "'
 
--- Join: List the names and phone numbers of customers who visited a business (joined by pNumber).
+-- Join: List the phone numbers of customers who visited a business (joined by pNumber).
 SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
         CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'
 
--- Aggregation with Group By: Count the number of times a customer with a given phone number has visited a business.
+-- Aggregation with Group By: List Total Number of Visits to All Businesses by pNumber
 SELECT count(DISTINCT arrivalTime), pNumber FROM VisitedTime GROUP BY pNumber
 
 -- Aggregation with Having: List the names and addresses of businesses with total transaction amounts higher than the input x.
 SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
 		 RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount) >'". $_POST["x"] ."'
-																		-- Nested Aggregation: Return the ID of the business with the highest average transaction amounts.		  
+
+-- Nested Aggregation: Return the ID of the business with the highest average transaction amounts.		  
 SELECT bid, AVG(amount)
 FROM RecordedTransaction
 GROUP BY bid
@@ -96,7 +97,7 @@ HAVING avg(amount) >=
                 FROM RecordedTransaction RT2
                 GROUP BY RT2.bid)
 				
--- Division: List the name of customers who visited all businesses.
+-- Division: List all the businesses visited by a customer
 select distinct name from CustomerPartyContact cpc
 where not exists (
         select * from Business b
