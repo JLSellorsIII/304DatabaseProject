@@ -7,6 +7,25 @@ html {
     body {
         margin-top: 4vh;
 
+        table {
+            width: 100%;
+
+            th {
+                background-color: #EEE;
+                outline-color: #AAA;
+                outline-width: 1px;
+                outline-style: solid;
+            }
+
+            td {
+                outline-color: #AAA;
+                outline-width: 1px;
+                outline-style: solid;
+                padding: 10px;
+            }
+
+        }
+
         .header {
             position: fixed;
             top: 0;
@@ -84,24 +103,6 @@ html {
 
         }
 
-        #mainTable {
-            width: 100%;
-
-            th {
-                background-color: #EEE;
-                outline-color: #AAA;
-                outline-width: 1px;
-                outline-style: solid;
-            }
-
-            td {
-                outline-color: #AAA;
-                outline-width: 1px;
-                outline-style: solid;
-                padding: 10px;
-            }
-
-        }
     }
 
 }
