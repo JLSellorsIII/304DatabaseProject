@@ -261,7 +261,6 @@
 						<div>
                             <p>Write Permission: </p>
                             <select id="permission" name="permission">
-								<option value=null>N/A</option>
 								<option value=1>Yes</option>
 								<option value=0>No</option>
 							</select>
@@ -514,7 +513,7 @@
 				<div id="mainTable"></div>
 			</div>
             <div class="op-container">
-                <h2>Get Covid Supplies with Quantity below X</h2>
+                <h2>List Covid Supplies with Quantity Below X</h2>
 				<form method="POST" action="index.php">
                     <div>
                         <p>X:</p>
@@ -526,7 +525,7 @@
                 <div id="getCovidSuppliesTable"></div>
             </div>
             <div class="op-container">
-                <h2>Get All Customers who Visited Business</h2>
+                <h2>List All Customers Who Visited Business</h2>
                 <form method="POST" action="index.php">
                     <div>
                         <p>Business: </p>
@@ -539,7 +538,7 @@
                 <div id="getCustomersWhoVisitedBusinessTable"></div>
             </div>
             <div class="op-container">
-                <h2>Get Businesses With Capacity Between X And Y</h2>
+                <h2>Get Businesses With Capacity Between X and Y</h2>
                 <form method="POST" action="index.php">
                     <div>
                         <p>X (Lower bound):</p>
@@ -556,7 +555,7 @@
             </div>
 
             <div class="op-container">
-                <h2>Get Customers Who visited all Businesses</h2>
+                <h2>List Customers Who Visited All Businesses</h2>
                 <form method="POST" action="index.php">
                     <input type="submit" class="submit button" value="Get" name="getCustomersWhoVisitedAllBusinesses">
                 </form>
@@ -565,7 +564,7 @@
             </div>
 
             <div class="op-container">
-                <h2>Get Visits by pNumber</h2>
+                <h2>List Total Number of Visits to All Businesses By pNumber</h2>
                 <form method="POST" action="index.php">
                     <input type="submit" class="submit button" value="Get" name="getVisitsBypNumber">
                 </form>
@@ -574,7 +573,7 @@
             </div>
 
             <div class="op-container">
-                <h2>Get Transactions grouped by business with totals over X</h2>
+                <h2>List Businesses With Total Transaction Amounts Over X</h2>
                 <form method="POST" action ="index.php">
                     <div>
                         <p>X: </p>
@@ -586,7 +585,7 @@
                 <div id="getTransactionsGroupedByBusinessWithTotalAboveXTable"></div>
         </div>
             <div class="op-container">
-                <h2>Get the business with the highest average transactions</h2>
+                <h2>Return the ID of the Business With the Highest Average Transaction Amounts</h2>
                 <form method="GET" action="index.php">
                     <input type="submit" class="submit button" value="Get" name="getHighestAvgTransactions">
                 </form>
@@ -595,7 +594,7 @@
             </div>
 
             <div class="op-container">
-                <h2>Get Businesses Visited By Customer</h2>
+                <h2>List All the Businesses Visited By a Customer</h2>
                 <form method="POST" action ="index.php">
                     <div>
                         <p>customer: </p>
@@ -1189,7 +1188,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 
     }
 
-    // shows the number of visits made by each CustomerPartyContact with a pNumber
+    // shows the number of total visits to businesses made by each CustomerPartyContact with a pNumber
     function handleGetVisitsBypNumber() {
 	    $result = executeSQL("SELECT count(*), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsBypNumberSuccess");
         $tableString = "<table><tr>";
@@ -1216,7 +1215,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 	    $altHeaders = null;
 	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
     }
-    
+  
 //Displays Transactions grouped by bid with amounts who sum to a value above the input X
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
