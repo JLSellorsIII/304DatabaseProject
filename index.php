@@ -614,6 +614,7 @@
 	</body>
 
 	 <script type="text/javascript">
+         //prints given text to a given element
 		function printToElement(id, text) {
 			if(typeof id === "string") {
 				document.getElementById(id).innerHTML += text;
@@ -622,6 +623,7 @@
 			}
 		}
 
+		//Resets an elements text
 		function resetElementText(id) {
 			if(typeof id === "string") {
 				document.getElementById(id).innerHTML = '';
@@ -654,6 +656,8 @@
 		echo "<script type='text/javascript'>" . $func. "</script>";
 	}
 
+
+//Connects to oracle, or fails to do so and echos error
 	function connectDB() {
 		global $db_conn;
 
@@ -669,7 +673,7 @@
 			return false;
 		}
 	}
-
+// disconnects from oracle
 	function disconnectDB() {
 		global $db_conn;
 		showAlert("Disconnected From DB");
@@ -708,7 +712,7 @@
 		return $statement;
 
 	}
-
+    //Resets and initializes the SQL tables
 	function initTables() {
 		global $db_conn;
 
@@ -727,6 +731,7 @@
 		OCICommit($db_conn);
 	}
 
+	//Inserts some values into our SQL tables so that our queries will have results
 	function populateTables() {
         global $db_conn;
         $popFile = fopen("InsertionsForPopulation.sql", 'r') or showAlert("Unable to open file tables.sql");
@@ -1004,7 +1009,9 @@ function handleAddPerishableConsumable() {
                    "updateBusinessAddressSuccess");
         OCICommit($db_conn);
     }
-	
+	// given executeSql result, headers altHeaders and elem, prints values of result associated with each header into
+//table under column labelled with corresponding altHeader if altHeaders is not null, if not then column is labelled with Header
+//table is printed to elem
 	function printTable($result, $headers, $altHeaders, $elem)
     {
         $tableString = "<table><tr>";
@@ -1031,6 +1038,7 @@ function handleAddPerishableConsumable() {
     }
 
 
+    //displays selected table
 	function handleDisplayTable() {
 		switch($_POST['table']) {
 			case "scheduledShift":
@@ -1133,6 +1141,7 @@ function handleAddPerishableConsumable() {
 		}
 	}
 
+	//gets all CovidSupplies with quantity below X given as input
 	function handleGetCovidSuppliesBelowX() {
 
 	    $result = executeSQL("SELECT * FROM CovidSupplies
@@ -1144,6 +1153,7 @@ function handleAddPerishableConsumable() {
 	    printTable($result, $headers, $altHeaders, "getCovidSuppliesTable");
     }
 
+    // gets all Businesses with Capacity between X and Y inputs
     function handleGetBusinessesWithCapacityBetweenXAndY() {
 	    $result = executeSQL("SELECT * FROM Business
                 WHERE Business.capacity >= '" . $_POST["x"] . "'AND  Business.capacity <= '". $_POST["y"] . "'",
@@ -1153,6 +1163,7 @@ function handleAddPerishableConsumable() {
         printTable($result, $headers, $altHeaders, "getBusinessesWithCapacityBetweenXAndYTable");
     }
 
+    //Gets Customers who visited all businesses
     function handleGetCustomersWhoVisitedAllBusinesses() {
 	    $result = executeSQL("select distinct name from CustomerPartyContact cpc
 where not exists (
@@ -1167,6 +1178,7 @@ where not exists (
         printTable($result, $headers, $altHeaders, "getCustomersWhoVisitedAllBusinessesTable");
     }
 
+    //Gets all customers who visited Business selected in input
     function handleGetCustomersWhoVisitedBusiness() {
 	    $result = executeSQL("SELECT CustomerPartyContact.name, CustomerPartyContact.pNumber FROM VisitedTime, CustomerPartyContact WHERE
 CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_POST["business"] . "'", "getCustomersWhoVisitedBusinessSuccess");
@@ -1176,6 +1188,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 
     }
 
+    // shows the number of visits made by each CustomerPartyContact with a pNumber
     function handleGetVisitsBypNumber() {
 	    $result = executeSQL("SELECT count(*), pNumber FROM VisitedTime GROUP BY pNumber", "getVisitsBypNumberSuccess");
         $tableString = "<table><tr>";
@@ -1193,6 +1206,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
+    //Gets Businesses visited by customer selected in input
     function handleGetBusinessesVisitedByCustomer() {
 	    $pNumber = $_POST["customer"];
 	    $result = executeSQL("SELECT Business.name, Business.address, Business.capacity FROM Business, VisitedTime WHERE
@@ -1202,7 +1216,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 	    printTable($result, $headers, $altHeaders, "getBusinessesVisitedByCustomerTable");
     }
     
-
+//Displays Transactions grouped by bid with amounts who sum to a value above the input X
     function handleGetTransactionsGroupedByBusinessWithTotalAboveX() {
 	    $result = executeSQL("SELECT SUM(amount), Business.name, Business.address FROM RecordedTransaction, Business WHERE RecordedTransaction.bid = Business.bid GROUP BY
                             RecordedTransaction.bid, Business.name, Business.address HAVING SUM(amount)
@@ -1224,6 +1238,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
         callJSFunc("printToElement(" . $elem . ", '" . $tableString . "')");
     }
 
+    //Displays the Business with the highest average transaction amount
     function handleGetHighestAvgTransactions() {
         $result = executeSQL(" SELECT bid, AVG(amount)
                                 FROM RecordedTransaction
@@ -1325,6 +1340,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 		handleGETRequest();
 	}
 
+	//Gets the CustomerPartyContacts and needed values for customerSelect and prints them
 	function fillCustomerSelect() {
 		if(connectDB()) {
 			$result = executeSQL("SELECT * FROM CustomerPartyContact", null);
@@ -1338,6 +1354,7 @@ CustomerPartyContact.pNumber = VisitedTime.pNumber AND VisitedTime.bid = '" . $_
 		disconnectDB();
 	}
 
+	//gets the Accounts and needed values for AccountSelect and prints them
 function fillAccountSelect() {
     if(connectDB()) {
         $result = executeSQL("SELECT * FROM Account", null);
@@ -1350,7 +1367,7 @@ function fillAccountSelect() {
     }
     disconnectDB();
 }
-
+//gets the ScheduledShifts and needed values for ShiftSelect and prints them
 function fillShiftSelect() {
     if(connectDB()) {
         $result = executeSQL("SELECT * FROM ScheduledShift", null);
@@ -1364,6 +1381,7 @@ function fillShiftSelect() {
     disconnectDB();
 }
 
+	//gets the Businesses and needed values for BusinessSelect and prints them
 	function fillBusinessSelect() {
 		if(connectDB()) {
 			$result = executeSQL("SELECT * FROM Business", null);
@@ -1377,6 +1395,7 @@ function fillShiftSelect() {
 		disconnectDB();
 	}
 
+	//Gets the Fines and needed values for the FineSelect and prints them
     function fillFineSelect() {
         if(connectDB()) {
             $result = executeSQL(
@@ -1393,6 +1412,7 @@ function fillShiftSelect() {
         disconnectDB();
     }
 
+	//Gets the Warning and needed values for the WarningSelect and prints them
     function fillWarningSelect() {
         if(connectDB()) {
             $result = executeSQL(
@@ -1409,6 +1429,7 @@ function fillShiftSelect() {
         disconnectDB();
     }
 
+	//gets the Violations and needed values for ViolationSelect and prints them
     function fillViolationSelect() {
         if(connectDB()) {
             $result = executeSQL(
@@ -1423,7 +1444,7 @@ function fillShiftSelect() {
         }
         disconnectDB();
     }
-
+// gets the TrackedFines and bid values for the Tracked Fines selection options and prints them
     function fillTrackedFineSelect() {
         if(connectDB()) {
             $result = executeSQL(

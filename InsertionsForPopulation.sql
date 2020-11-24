@@ -146,46 +146,49 @@ INSERT INTO CustomerPartyContact(pNumber, name) VALUES
     (16043402903, 'Sal');
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 90, TO_TIMESTAMP('2020-06-12 13:30:00', 'YYYY-MM-DD HH24:MI:SS'));
+    ('06.nov.2020', 90, TO_TIMESTAMP('2020-06-12 13:30:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'), 60, TO_TIMESTAMP('2020-06-12 13:30:00', 'YYYY-MM-DD HH24:MI:SS'));
+    ('21.sep.2020', 60, TO_TIMESTAMP('2020-06-12 13:30:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    (TO_TIMESTAMP('2020-06-12 11:00:00', 'YYYY-MM-DD HH24:MI:SS'), 30, TO_TIMESTAMP('2020-06-12 11:30:00', 'YYYY-MM-DD HH24:MI:SS'));
+    ('30.dec.2019', 30, TO_TIMESTAMP('2020-06-12 11:30:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    (TO_TIMESTAMP('2020-06-12 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 90, TO_TIMESTAMP('2020-06-12 13:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+    ('28.aug.2020', 90, TO_TIMESTAMP('2020-06-12 13:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 30, TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'));
+    ('22.jul.2021', 30, TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+    INSERT INTO VisitedLength(arrivalTime, Duration, endTime) VALUES
+    ('01.apr.2020', 30, TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'));
 	
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402230, 0001, 90);
+    ('06.nov.2020', 16043402230, 0001, 90);
 
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:30:00', 'YYYY-MM-DD HH24:MI:SS'), 16042902222, 0001, 60);
+    ('21.sep.2020', 16042902222, 0001, 60);
 
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 11:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16045552235, 0002, 30);
+    ('30.dec.2019', 16045552235, 0002, 30);
 
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 16043400230, 0002, 90);
+    ('28.aug.2020', 16043400230, 0002, 90);
 
 INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0003, 30);
+    ('22.jul.2021', 16043402903, 0003, 30);
 
     INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0001, 30);
+    ('01.apr.2020', 16043402903, 0001, 30);
 
     INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0002, 30);
+    ('01.apr.2020', 16043402903, 0002, 30);
 
     INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0004, 30);
+    ('01.apr.2020', 16043402903, 0004, 30);
 
     INSERT INTO VisitedTime(arrivalTime, pNumber, bid, Duration) VALUES
-    (TO_TIMESTAMP('2020-06-12 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 16043402903, 0005, 30);
+    ('01.apr.2020', 16043402903, 0005, 30);
 
 INSERT INTO Violation(law, description) VALUES
     ('Overcapacity', 'The business has had more people in the store at one time than they are permitted to');
